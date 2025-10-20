@@ -1,19 +1,29 @@
+# Unity生成文件
 [Ll]ibrary/
 [Tt]emp/
-[Oo]bj/
 [Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
-[Mm]emoryCaptures/
-.vs/
+UserSettings/
+MemoryCaptures/
+obj/
+
+# VS/IDE缓存
+.vscode/
+.idea/
 *.csproj
 *.sln
 *.user
 *.unityproj
 *.pidb
 *.booproj
-.DS_Store
-Thumbs.db
-sysinfo.txt
-UserSettings/Layouts/default-2022.dwlt
+
+# 自动生成
+*.tmp
+*.bak
+*.old
+*.swp
+*.DS_Store
+
+# 不提交个人布局
 *.dwlt
