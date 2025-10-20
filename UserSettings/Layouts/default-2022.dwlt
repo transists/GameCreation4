@@ -477,7 +477,7 @@ MonoBehaviour:
   m_LastFolders:
   - Assets/Sprites
   m_LastFoldersGridSize: 16
-  m_LastProjectPath: C:\Users\trans\UnityGame\GameCreation4
+  m_LastProjectPath: C:\Users\tangp\Documents\GitHub\GameCreation4
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
@@ -1035,9 +1035,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -1.3554944, y: -0.22257066, z: 0.04524668}
+    m_Target: {x: -0.7437372, y: -0.51275575, z: 0.038397644}
     speed: 2
-    m_Value: {x: -1.3554944, y: -0.22257066, z: 0.04524668}
+    m_Value: {x: -0.7437372, y: -0.51275575, z: 0.038397644}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1087,9 +1087,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 5.475329
+    m_Target: 6.1602273
     speed: 2
-    m_Value: 5.475329
+    m_Value: 6.1602273
   m_Ortho:
     m_Target: 1
     speed: 2
