@@ -17,6 +17,7 @@ obj/
 *.unityproj
 *.pidb
 *.booproj
+*.vs
 
 # 自动生成
 *.tmp
@@ -27,3 +28,4 @@ obj/
 
 # 不提交个人布局
 *.dwlt
+*.db
