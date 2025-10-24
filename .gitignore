@@ -73,3 +73,5 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+.vs/GameCreation4/CopilotIndices/17.14.1290.42047/CodeChunks.db
+.vs/GameCreation4/CopilotIndices/17.14.1290.42047/SemanticSymbols.db
