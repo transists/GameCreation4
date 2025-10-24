@@ -1462,8 +1462,8 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!61 &253359185
-BoxCollider2D:
+--- !u!19719996 &253359185
+TilemapCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1491,22 +1491,13 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 22, y: 10}
-  m_EdgeRadius: 0
+  m_MaximumTileChangeCount: 1000
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1 &392267839
 GameObject:
   m_ObjectHideFlags: 0
@@ -3601,6 +3592,7 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   deadSprite: {fileID: 0}
   shotSE: {fileID: 0}
+  gameOverTime: 2
 --- !u!50 &2008568087
 Rigidbody2D:
   serializedVersion: 4

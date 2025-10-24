@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PixelRect:
     serializedVersion: 2
-    x: 7.3333335
-    y: 52.666668
+    x: 20
+    y: 68
     width: 1692
     height: 822.6667
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Project
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 100}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 0
-  controlID: 140
+  controlID: 141
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -332,8 +332,8 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 885.3334
-    y: 82.66667
+    x: 879
+    y: 19
     width: 215.33337
     height: 751.6667
   m_SerializedDataModeController:
@@ -349,25 +349,25 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 56730000
-      m_LastClickedID: 0
-      m_ExpandedIDs: bc90ffffdeafffffdcbaffff8abbffff88d9ffffc2f6ffff68f7ffff18fbffffd4770000027800001c780000
+      m_SelectedIDs: e4740000
+      m_LastClickedID: 29924
+      m_ExpandedIDs: eaf6ffffacf8ffffc2faffffd0740000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: Canvas
+        m_OriginalName: Canvas
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 0
+        m_UserData: 29746
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 0
         m_IsRenamingFilename: 0
-        m_ClientGUIView: {fileID: 10}
+        m_ClientGUIView: {fileID: 7}
       m_SearchString: 
     m_ExpandedScenes: []
     m_CurrenRootInstanceID: 0
@@ -395,8 +395,8 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1412
-    y: 82.66667
+    x: 1424.6667
+    y: 98
     width: 286.33337
     height: 751.6667
   m_SerializedDataModeController:
@@ -442,8 +442,8 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1102.6667
-    y: 82.66667
+    x: 1096.3334
+    y: 19
     width: 307.33325
     height: 751.6667
   m_SerializedDataModeController:
@@ -482,9 +482,9 @@ MonoBehaviour:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 0e730000
-    m_LastClickedID: 29454
-    m_ExpandedIDs: 000000008c71000000ca9a3bffffff7f
+    m_SelectedIDs: c0730000
+    m_LastClickedID: 29632
+    m_ExpandedIDs: 00000000a873000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -512,7 +512,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000008c710000
+    m_ExpandedIDs: 00000000a8730000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -539,22 +539,22 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: ea62000070610000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: Goal
-      m_OriginalName: Goal
+      m_Name: 
+      m_OriginalName: 
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 32762
+      m_UserData: 0
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 8}
     m_CreateAssetUtility:
@@ -588,8 +588,8 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 7.3333335
-    y: 462.6667
+    x: 0
+    y: 399
     width: 877
     height: 371.6667
   m_SerializedDataModeController:
@@ -686,8 +686,8 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 7.3333335
-    y: 82.66667
+    x: 0
+    y: 19
     width: 877
     height: 359
   m_SerializedDataModeController:
@@ -989,7 +989,7 @@ MonoBehaviour:
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
-      displayed: 0
+      displayed: 1
       snapOffset: {x: 48, y: 48}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
@@ -1048,9 +1048,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 6.0330706, y: 2.108072, z: -0.017808234}
+    m_Target: {x: 0.4455164, y: 0.007365469, z: -0.04568495}
     speed: 2
-    m_Value: {x: 6.0330706, y: 2.108072, z: -0.017808234}
+    m_Value: {x: 0.4455164, y: 0.007365469, z: -0.04568495}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1100,9 +1100,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 2.6468155
+    m_Target: 5.28264
     speed: 2
-    m_Value: 2.6468155
+    m_Value: 5.28264
   m_Ortho:
     m_Target: 1
     speed: 2
