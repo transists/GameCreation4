@@ -9,9 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/taitoru.unity
-    guid: 5ae098ddc5afa8043871c1d12868807a
-  - enabled: 1
-    path: Assets/Scenes/Goal.unity
-    guid: 2856e2f46f3c045468eca65f9033dd6c
+    path: Assets/Scenes/GameOver.unity
+    guid: 611c1ede4e430174398dd7ab66717c36
   m_configObjects: {}
