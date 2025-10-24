@@ -3,11 +3,19 @@
   "WorkspaceRootPath": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|c:\\users\\tangp\\documents\\github\\gamecreation4\\assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|c:\\users\\tangp\\documents\\github\\gamecreation4\\assets\\scripts\\goal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\goal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|c:\\users\\tangp\\documents\\github\\gamecreation4\\assets\\scripts\\titlemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\titlemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|c:\\users\\tangp\\documents\\github\\gamecreation4\\assets\\scripts\\enemypatrol1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\assets\\scripts\\enemypatrol1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B0BFAAD9-36CA-D874-087D-50FA27B41556}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\enemypatrol1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -26,32 +34,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "EnemyPatrol1.cs",
-              "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\EnemyPatrol1.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\EnemyPatrol1.cs",
-              "ToolTip": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\EnemyPatrol1.cs",
-              "RelativeToolTip": "Assets\\Scripts\\EnemyPatrol1.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAAVAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "Goal.cs",
+              "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\Goal.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Goal.cs",
+              "ToolTip": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\Goal.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Goal.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAswBgAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-22T09:09:03.73Z",
+              "WhenOpened": "2025-10-24T05:23:07.642Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "PlayerController.cs",
-              "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\PlayerController.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerController.cs",
-              "ToolTip": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\PlayerController.cs",
-              "RelativeToolTip": "Assets\\Scripts\\PlayerController.cs",
-              "ViewState": "AgIAAGUAAAAAAAAAAAAMwHoAAAAFAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "TItleManager.cs",
+              "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\TItleManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\TItleManager.cs",
+              "ToolTip": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\TItleManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\TItleManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-22T09:06:21.133Z",
+              "WhenOpened": "2025-10-24T04:53:46.557Z",
               "EditorCaption": ""
             },
             {
@@ -61,6 +69,30 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "EnemyPatrol1.cs",
+              "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\EnemyPatrol1.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\EnemyPatrol1.cs",
+              "ToolTip": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\EnemyPatrol1.cs",
+              "RelativeToolTip": "Assets\\Scripts\\EnemyPatrol1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-22T09:09:03.73Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PlayerController.cs",
+              "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\PlayerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerController.cs",
+              "ToolTip": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\PlayerController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayerController.cs",
+              "ViewState": "AgIAAGUAAAAAAAAAAAAMwHoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-22T09:06:21.133Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "EnemyFieldOfView.cs",
               "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\EnemyFieldOfView.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\EnemyFieldOfView.cs",
@@ -72,7 +104,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "EnemyPatrol.cs",
               "DocumentMoniker": "C:\\Users\\tangp\\Documents\\GitHub\\GameCreation4\\Assets\\Scripts\\EnemyPatrol.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\EnemyPatrol.cs",
