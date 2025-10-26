@@ -16,7 +16,7 @@ public class GameOverController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return))
         {
             Debug.Log("Enter Key Pressed - Reloading Stage_1");
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Stage_1");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
         }
     }
 }

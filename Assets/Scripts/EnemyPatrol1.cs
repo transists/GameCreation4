@@ -20,6 +20,9 @@ public class EnemyPatrol1 : MonoBehaviour
     private bool isDead = false;
     private SpriteRenderer spriteRenderer;
 
+    public float gameOverTime = 2.0f; // 游戏结束延迟时间
+    private float playerVisibleTimer = 0.0f; // 玩家可见时间
+
     private void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -28,15 +31,24 @@ public class EnemyPatrol1 : MonoBehaviour
 
     void Update()
     {
-        if (playerController == null) return; // **新增：如果玩家为空，则不再执行巡逻或攻击**
+        if (playerController.transform == null) return;
 
         if (PlayerInSight())
         {
             chasingPlayer = true;
             ChasePlayer();
+            Patrol();
+
+            playerVisibleTimer += Time.deltaTime;
+            Debug.Log("Player visible for: " + playerVisibleTimer + " seconds");
+            if (playerVisibleTimer >= gameOverTime)
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("GameOver");
+            }
         }
         else
         {
+            playerVisibleTimer = 0.0f;
             chasingPlayer = false;
             Patrol();
         }

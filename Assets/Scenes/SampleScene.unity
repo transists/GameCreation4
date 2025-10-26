@@ -3740,6 +3740,7 @@ MonoBehaviour:
   firePoint: {fileID: 0}
   deadSprite: {fileID: 0}
   shotSE: {fileID: 0}
+  gameOverTime: 2
 --- !u!1 &2010758643
 GameObject:
   m_ObjectHideFlags: 0
