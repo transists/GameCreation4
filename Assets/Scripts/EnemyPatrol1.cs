@@ -37,10 +37,9 @@ public class EnemyPatrol1 : MonoBehaviour
         {
             chasingPlayer = true;
             ChasePlayer();
-            Patrol();
 
             playerVisibleTimer += Time.deltaTime;
-            Debug.Log("Player visible for: " + playerVisibleTimer + " seconds");
+            //Debug.Log("Player visible for: " + playerVisibleTimer + " seconds");
             if (playerVisibleTimer >= gameOverTime)
             {
                 UnityEngine.SceneManagement.SceneManager.LoadScene("GameOver");
@@ -104,7 +103,7 @@ public class EnemyPatrol1 : MonoBehaviour
     {
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
         transform.rotation = Quaternion.Euler(0, 0, angle);
-
+        Debug.Log("Enemy Rotation Angle: " + angle);
         if (fieldOfView != null)
         {
             fieldOfView.transform.rotation = transform.rotation;
