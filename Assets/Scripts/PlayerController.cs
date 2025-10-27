@@ -5,38 +5,45 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public bool IsDisguised { get; private set; } = false;
-    [Header("ƒ}ƒbƒvî•ñ")]
-    public LayerMask wallLayer; // •ÇƒŒƒCƒ„[‚ğƒCƒ“ƒXƒyƒNƒ^[‚©‚çİ’è
-    private bool canUseDisguise = true; // •Ï‘•‚ªˆê“x‚¾‚¯g‚¦‚é‚æ‚¤‚É‚·‚é‚½‚ß‚Ìƒtƒ‰ƒO
-    public Color disguisedColor = Color.cyan; // •Ï‘•’†‚ÌFiƒCƒ“ƒXƒyƒNƒ^[‚Å•ÏX‰Â”\j
-    public float disguiseDuration = 10f; // •Ï‘•‚µ‚Ä‚¢‚éŠÔ
-    private Color originalColor; // Œ³‚ÌF‚ğ•Û‘¶‚·‚é•Ï”
+    [Header("ãƒãƒƒãƒ—æƒ…å ±")]
+    public LayerMask wallLayer; // å£ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã‹ã‚‰è¨­å®š
+    private bool canUseDisguise = true; // å¤‰è£…ãŒä¸€åº¦ã ã‘ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚°
+    public Color disguisedColor = Color.cyan; // å¤‰è£…ä¸­ã®è‰²ï¼ˆã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ãƒ¼ã§å¤‰æ›´å¯èƒ½ï¼‰
+    public float disguiseDuration = 10f; // å¤‰è£…ã—ã¦ã„ã‚‹æ™‚é–“
+    private Color originalColor; // å…ƒã®è‰²ã‚’ä¿å­˜ã™ã‚‹å¤‰æ•°
     private SpriteRenderer spriteRenderer;
 
-    // --- «‚±‚±‚©‚çƒOƒŠƒbƒhˆÚ“®—p‚ÌƒR[ƒh ---
-    public float moveSpeed = 5f; // 1ƒ}ƒX‚ğˆÚ“®‚·‚é‘¬‚³
-    private bool isMoving = false; // ˆÚ“®’†‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
-    private Vector3 targetPosition; // –Ú•W’n“_
-    // --- ª‚±‚±‚Ü‚ÅƒOƒŠƒbƒhˆÚ“®—p‚ÌƒR[ƒh ---
+    // --- â†“ã“ã“ã‹ã‚‰ã‚°ãƒªãƒƒãƒ‰ç§»å‹•ç”¨ã®ã‚³ãƒ¼ãƒ‰ ---
+    public float moveSpeed = 5f; // 1ãƒã‚¹ã‚’ç§»å‹•ã™ã‚‹é€Ÿã•
+    private bool isMoving = false; // ç§»å‹•ä¸­ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
+    private Vector3 targetPosition; // ç›®æ¨™åœ°ç‚¹
+    private Rigidbody2D rb;
+    private Vector2 moveInput;
+    // --- â†‘ã“ã“ã¾ã§ã‚°ãƒªãƒƒãƒ‰ç§»å‹•ç”¨ã®ã‚³ãƒ¼ãƒ‰ ---
 
     // Start is called before the first frame update
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        originalColor = spriteRenderer.color; // ŠJn‚ÌF‚ğ‹L‰¯
-        // Œ»İˆÊ’u‚©‚çˆê”Ô‹ß‚¢ƒ^ƒCƒ‹‚Ì’†S‚ÉƒXƒiƒbƒv‚³‚¹‚é
+        originalColor = spriteRenderer.color; // é–‹å§‹æ™‚ã®è‰²ã‚’è¨˜æ†¶
+        // ç¾åœ¨ä½ç½®ã‹ã‚‰ä¸€ç•ªè¿‘ã„ã‚¿ã‚¤ãƒ«ã®ä¸­å¿ƒã«ã‚¹ãƒŠãƒƒãƒ—ã•ã›ã‚‹
         float x = Mathf.Floor(transform.position.x) + 0.5f;
         float y = Mathf.Floor(transform.position.y) + 0.5f;
         transform.position = new Vector3(x, y, 0);
 
-        // ˆÚ“®‚Ì–Ú•W’n“_‚à‰Šú‰»‚µ‚Ä‚¨‚­
+        // ç§»å‹•ã®ç›®æ¨™åœ°ç‚¹ã‚‚åˆæœŸåŒ–ã—ã¦ãŠã
         targetPosition = transform.position;
+    }
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // EƒL[‚ğ‰Ÿ‚µ‚½‚ç•Ï‘•‚·‚é
+        // Eã‚­ãƒ¼ã‚’æŠ¼ã—ãŸã‚‰å¤‰è£…ã™ã‚‹
         if (canUseDisguise && Input.GetKeyDown(KeyCode.E))
         {
             Disguise();
@@ -44,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
         HandleMovement();
 
-        // --- «‚±‚±‚©‚çƒOƒŠƒbƒhˆÚ“®—p‚ÌƒR[ƒh ---
+        /* --- â†“ã“ã“ã‹ã‚‰ã‚°ãƒªãƒƒãƒ‰ç§»å‹•ç”¨ã®ã‚³ãƒ¼ãƒ‰ ---
         if (!isMoving)
         {
             float horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -70,10 +77,22 @@ public class PlayerController : MonoBehaviour
                 isMoving = false;
             }
         }
-        // --- ª‚±‚±‚Ü‚ÅƒOƒŠƒbƒhˆÚ“®—p‚ÌƒR[ƒh ---
+        / --- â†‘ã“ã“ã¾ã§ã‚°ãƒªãƒƒãƒ‰ç§»å‹•ç”¨ã®ã‚³ãƒ¼ãƒ‰ ---*/
+
+        // è·å–è¾“å…¥æ–¹å‘ï¼ˆé”®ç›˜ï¼‰
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
+        // ç»„åˆä¸ºå‘é‡å¹¶å½’ä¸€åŒ–
+        moveInput = new Vector2(moveX, moveY).normalized;
     }
 
-    // ˆÚ“®‚Ì“ü—Í‚Æ”»’è‚ğs‚¤ƒƒ\ƒbƒh
+    void FixedUpdate()
+    {
+        // ä½¿ç”¨ç‰©ç†æ–¹å¼ç§»åŠ¨ï¼ˆä¼šæ£€æµ‹ç¢°æ’ï¼‰
+        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+    }
+
+    // ç§»å‹•ã®å…¥åŠ›ã¨åˆ¤å®šã‚’è¡Œã†ãƒ¡ã‚½ãƒƒãƒ‰
     private void HandleMovement()
     {
         if (isMoving) return;
@@ -104,63 +123,63 @@ public class PlayerController : MonoBehaviour
 
     private bool IsValidMove(Vector3 targetPos)
     {
-        // •û–@1Fƒ^ƒCƒ‹ƒ}ƒbƒv‚Å”»’è‚·‚éê‡
+        // æ–¹æ³•1ï¼šã‚¿ã‚¤ãƒ«ãƒãƒƒãƒ—ã§åˆ¤å®šã™ã‚‹å ´åˆ
         // Vector3Int targetCell = wallTilemap.WorldToCell(targetPos);
         // if (wallTilemap.HasTile(targetCell))
         // {
-        //     return false; // •Ç‚ª‚ ‚é‚Ì‚ÅˆÚ“®•s‰Â
+        //     return false; // å£ãŒã‚ã‚‹ã®ã§ç§»å‹•ä¸å¯
         // }
 
-        // •û–@2FƒŒƒCƒ„[‚Å”»’è‚·‚éê‡
+        // æ–¹æ³•2ï¼šãƒ¬ã‚¤ãƒ¤ãƒ¼ã§åˆ¤å®šã™ã‚‹å ´åˆ
         Collider2D hit = Physics2D.OverlapCircle(targetPos, 0.2f, wallLayer);
         if (hit != null)
         {
-            return false; // •Ç‚ª‚ ‚é‚Ì‚ÅˆÚ“®•s‰Â
+            return false; // å£ãŒã‚ã‚‹ã®ã§ç§»å‹•ä¸å¯
         }
 
-        // ‚Ç‚Ìƒ`ƒFƒbƒN‚É‚àˆø‚Á‚©‚©‚ç‚È‚¯‚ê‚ÎˆÚ“®‰Â”\
+        // ã©ã®ãƒã‚§ãƒƒã‚¯ã«ã‚‚å¼•ã£ã‹ã‹ã‚‰ãªã‘ã‚Œã°ç§»å‹•å¯èƒ½
         return true;
     }
 
     private void Disguise()
     {
-        // •Ï‘•ó‘Ô‚É‚·‚é
+        // å¤‰è£…çŠ¶æ…‹ã«ã™ã‚‹
         IsDisguised = true;
 
-        // ‚à‚¤g‚¦‚È‚¢‚æ‚¤‚Éƒtƒ‰ƒO‚ğfalse‚É‚·‚é
+        // ã‚‚ã†ä½¿ãˆãªã„ã‚ˆã†ã«ãƒ•ãƒ©ã‚°ã‚’falseã«ã™ã‚‹
         canUseDisguise = false;
 
-        // Œ©‚½–Ú‚ğ•Ï‚¦‚éi—áFF‚ğ•Ï‚¦‚éj
+        // è¦‹ãŸç›®ã‚’å¤‰ãˆã‚‹ï¼ˆä¾‹ï¼šè‰²ã‚’å¤‰ãˆã‚‹ï¼‰
         if (spriteRenderer != null)
         {
             spriteRenderer.color = disguisedColor;
         }
 
         StartCoroutine(DisguiseTimerCoroutine());
-        Debug.Log("•Ï‘•‚µ‚½I 10•bŒã‚É‰ğœ‚³‚ê‚Ü‚·B");
+        Debug.Log("å¤‰è£…ã—ãŸï¼ 10ç§’å¾Œã«è§£é™¤ã•ã‚Œã¾ã™ã€‚");
     }
 
-    // 10•b‘Ò‚Á‚Ä‚©‚ç•Ï‘•‰ğœ‚ğŒÄ‚Ño‚·ƒRƒ‹[ƒ`ƒ“
+    // 10ç§’å¾…ã£ã¦ã‹ã‚‰å¤‰è£…è§£é™¤ã‚’å‘¼ã³å‡ºã™ã‚³ãƒ«ãƒ¼ãƒãƒ³
     private System.Collections.IEnumerator DisguiseTimerCoroutine()
     {
-        // disguiseDuration‚Åw’è‚µ‚½•b”‚¾‚¯‘Ò‚Â
+        // disguiseDurationã§æŒ‡å®šã—ãŸç§’æ•°ã ã‘å¾…ã¤
         yield return new WaitForSeconds(disguiseDuration);
 
-        // ŠÔ‚ª—ˆ‚½‚ç•Ï‘•‰ğœƒƒ\ƒbƒh‚ğŒÄ‚Ô
+        // æ™‚é–“ãŒæ¥ãŸã‚‰å¤‰è£…è§£é™¤ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã¶
         RemoveDisguise();
     }
 
-    // •Ï‘•‚ğ‰ğœ‚·‚éƒƒ\ƒbƒh
+    // å¤‰è£…ã‚’è§£é™¤ã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
     private void RemoveDisguise()
     {
         IsDisguised = false;
 
-        // F‚ğŒ³‚ÌF‚É–ß‚·
+        // è‰²ã‚’å…ƒã®è‰²ã«æˆ»ã™
         if (spriteRenderer != null)
         {
             spriteRenderer.color = originalColor;
         }
 
-        Debug.Log("•Ï‘•‚ª‰ğœ‚³‚ê‚½I");
+        Debug.Log("å¤‰è£…ãŒè§£é™¤ã•ã‚ŒãŸï¼");
     }
 }
