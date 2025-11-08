@@ -3312,6 +3312,9 @@ MonoBehaviour:
   disguisedColor: {r: 0, g: 1, b: 1, a: 1}
   disguiseDuration: 10
   moveSpeed: 2.5
+  frontSprite: {fileID: 21300000, guid: ca2d052fcbb1339459b7d7912b8be2f7, type: 3}
+  backSprite: {fileID: 21300000, guid: 58c89942d48aae647a32cfd89f98bab3, type: 3}
+  facingDeadZone: 0.1
   detectedSpeedMultiplier: 2
   speedLerp: 12
   goalLockSeconds: 10

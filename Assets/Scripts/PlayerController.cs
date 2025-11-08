@@ -15,11 +15,19 @@ public class PlayerController : MonoBehaviour
 
     // --- ↓ここからグリッド移動用のコード ---
     public float moveSpeed = 2.5f; // 1マスを移動する速さ
-    private bool isMoving = false; // 移動中かどうかのフラグ
+    //private bool isMoving = false; // 移動中かどうかのフラグ
     private Vector3 targetPosition; // 目標地点
     private Rigidbody2D rb;
     private Vector2 moveInput;
     // --- ↑ここまでグリッド移動用のコード ---
+
+    [Header("見た目：向き別スプライト")]
+    public Sprite frontSprite;        // 正面（デフォルト＆↓）
+    public Sprite backSprite;         // 後ろ（↑）
+    [Tooltip("向き切替のデッドゾーン（小さすぎる上下入力は無視）")]
+    public float facingDeadZone = 0.1f;
+
+    private SpriteRenderer sr;
 
     [Header("検知時のスピード設定")]
     [Tooltip("敵に見つかっている間の速度倍率")]
@@ -42,8 +50,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        originalColor = spriteRenderer.color; // 開始時の色を記憶
+        if (sr) originalColor = sr.color; // 開始時の色を記憶
         // 現在位置から一番近いタイルの中心にスナップさせる
         float x = Mathf.Floor(transform.position.x) + 0.5f;
         float y = Mathf.Floor(transform.position.y) + 0.5f;
@@ -57,6 +64,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponentInChildren<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -68,41 +76,12 @@ public class PlayerController : MonoBehaviour
             Disguise();
         }
 
-        HandleMovement();
-
-        /* --- ↓ここからグリッド移動用のコード ---
-        if (!isMoving)
-        {
-            float horizontalInput = Input.GetAxisRaw("Horizontal");
-            float verticalInput = Input.GetAxisRaw("Vertical");
-
-            if (Mathf.Abs(horizontalInput) > 0.5f)
-            {
-                targetPosition = transform.position + new Vector3(Mathf.Sign(horizontalInput), 0, 0);
-                isMoving = true;
-            }
-            else if (Mathf.Abs(verticalInput) > 0.5f)
-            {
-                targetPosition = transform.position + new Vector3(0, Mathf.Sign(verticalInput), 0);
-                isMoving = true;
-            }
-        }
-
-        if (isMoving)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-            if (transform.position == targetPosition)
-            {
-                isMoving = false;
-            }
-        }
-        / --- ↑ここまでグリッド移動用のコード ---*/
-
         // 获取输入方向（键盘）
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
-        // 组合为向量并归一化
         moveInput = new Vector2(moveX, moveY).normalized;
+        // 组合为向量并归一化
+        UpdateFacingByInput(moveInput);
         // 速度ターゲットを決めて補間（見つかっていれば倍率を掛ける）
         float targetSpeed = isDetected ? moveSpeed * detectedSpeedMultiplier : moveSpeed;
         currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, speedLerp * Time.deltaTime);
@@ -120,7 +99,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // 移動の入力と判定を行うメソッド
-    private void HandleMovement()
+    /*private void HandleMovement()
     {
         if (isMoving) return;
 
@@ -145,6 +124,23 @@ public class PlayerController : MonoBehaviour
         {
             targetPosition = potentialTargetPosition;
             isMoving = true;
+        }
+    }*/
+
+    private void UpdateFacingByInput(Vector2 input)
+    {
+        if (!sr) return;
+
+        // 上下入力でのみ切替。左右や停止時は仕様通り「正面」維持
+        if (input.y > facingDeadZone)
+        {
+            // 上へ：後ろ姿
+            if (backSprite && sr.sprite != backSprite) sr.sprite = backSprite;
+        }
+        else
+        {
+            // デフォルト＆下/停止：正面
+            if (frontSprite && sr.sprite != frontSprite) sr.sprite = frontSprite;
         }
     }
 
@@ -177,10 +173,7 @@ public class PlayerController : MonoBehaviour
         canUseDisguise = false;
 
         // 見た目を変える（例：色を変える）
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.color = disguisedColor;
-        }
+        if (sr) sr.color = disguisedColor;
 
         StartCoroutine(DisguiseTimerCoroutine());
         Debug.Log("変装した！ 10秒後に解除されます。");
@@ -202,10 +195,7 @@ public class PlayerController : MonoBehaviour
         IsDisguised = false;
 
         // 色を元の色に戻す
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.color = originalColor;
-        }
+        if (sr) sr.color = originalColor;
 
         Debug.Log("変装が解除された！");
     }
