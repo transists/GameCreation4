@@ -201,12 +201,18 @@ public class PlayerController : MonoBehaviour
     }
 
     // 公開API：敵側から発見/見失いを通知
-    public void SetDetected(bool detected)
+    public void SetDetected(bool detected, float speedMultiplier = -1f)
     {
         // 立ち上がり（false -> true）で10秒ロック開始
         if (!isDetected && detected)
         {
             goalLockTimer = goalLockSeconds;
+        }
+
+        // 警备员追逐玩家时的玩家速度，默认0表示玩家速度不变更，超过0的数字表示玩家速度倍率
+        if (speedMultiplier >= 0f)
+        {
+            detectedSpeedMultiplier = speedMultiplier;
         }
 
         // 状態が変わった時のみ切り替え（不要なら単純代入でOK）

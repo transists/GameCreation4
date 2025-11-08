@@ -3591,7 +3591,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2008568084}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9873c0a47080274b92e98fe2f0f1cdc, type: 3}
   m_Name: 
@@ -3624,6 +3624,8 @@ MonoBehaviour:
   - {fileID: 1878735020}
   - {fileID: 2097912979}
   moveSpeed: 3
+  chaseSpeed: 5
+  playerSpeedMultiplier: 3
   fieldOfView: {fileID: 590550997}
   playerController: {fileID: 1187204328}
   shotSE: {fileID: 0}
