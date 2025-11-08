@@ -1334,7 +1334,7 @@ MonoBehaviour:
   viewAngle: 90
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
 --- !u!23 &590550998
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3164,7 +3164,10 @@ MonoBehaviour:
     m_Bits: 8
   disguisedColor: {r: 0, g: 1, b: 1, a: 1}
   disguiseDuration: 10
-  moveSpeed: 5
+  moveSpeed: 2.5
+  detectedSpeedMultiplier: 2
+  speedLerp: 12
+  currentSpeed: 0
 --- !u!50 &1187204329
 Rigidbody2D:
   serializedVersion: 4
@@ -3281,6 +3284,7 @@ GameObject:
   - component: {fileID: 2008568088}
   - component: {fileID: 2008568087}
   - component: {fileID: 2008568090}
+  - component: {fileID: 2008568091}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -3451,6 +3455,29 @@ MonoBehaviour:
   playerController: {fileID: 1187204328}
   shotSE: {fileID: 0}
   gameOverTime: 2
+--- !u!114 &2008568091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008568084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1fe3043cce170048bb0a0fdf0b5d673, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patrolPoints:
+  - {fileID: 683505102}
+  - {fileID: 1135803837}
+  - {fileID: 1878735020}
+  - {fileID: 2097912979}
+  moveSpeed: 3
+  fieldOfView: {fileID: 590550997}
+  playerController: {fileID: 1187204328}
+  shotSE: {fileID: 0}
+  gameOverTime: 2
+  loseSightGrace: 0.3
 --- !u!1 &2010758643
 GameObject:
   m_ObjectHideFlags: 0

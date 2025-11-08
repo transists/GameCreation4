@@ -22,9 +22,17 @@ public class Goal : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        var pc = other.GetComponent<PlayerController>();
+        if (pc == null) return; // プレイヤー以外は無視
+
+        if (!pc.CanGoal)
         {
-            SceneManager.LoadScene(nextSceneName);
+            // ロック中：ゴールしない
+            Debug.Log("Goal locked: detected recently, wait a bit.");
+            return;
         }
+
+        // ゴールOK：シーン遷移
+        SceneManager.LoadScene(nextSceneName);
     }
 }
