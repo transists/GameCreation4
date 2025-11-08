@@ -14,12 +14,30 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
 
     // --- ↓ここからグリッド移動用のコード ---
-    public float moveSpeed = 5f; // 1マスを移動する速さ
+    public float moveSpeed = 2.5f; // 1マスを移動する速さ
     private bool isMoving = false; // 移動中かどうかのフラグ
     private Vector3 targetPosition; // 目標地点
     private Rigidbody2D rb;
     private Vector2 moveInput;
     // --- ↑ここまでグリッド移動用のコード ---
+
+    [Header("検知時のスピード設定")]
+    [Tooltip("敵に見つかっている間の速度倍率")]
+    public float detectedSpeedMultiplier = 1.6f;
+    [Tooltip("速度の補間係数（大きいほど素早く目標速度へ）")]
+    public float speedLerp = 12f;
+
+    [Header("ゴール制限")]
+    [Tooltip("発見後ゴール不可の秒数")]
+    public float goalLockSeconds = 10f;
+
+    private float goalLockTimer = 0f;
+    public bool CanGoal => goalLockTimer <= 0f;
+
+    // 内部状態
+    private bool isDetected = false;
+    public float currentSpeed;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +51,7 @@ public class PlayerController : MonoBehaviour
 
         // 移動の目標地点も初期化しておく
         targetPosition = transform.position;
+        currentSpeed = moveSpeed; // 現在速度を基準速度から開始
     }
 
     void Awake()
@@ -84,12 +103,20 @@ public class PlayerController : MonoBehaviour
         float moveY = Input.GetAxisRaw("Vertical");
         // 组合为向量并归一化
         moveInput = new Vector2(moveX, moveY).normalized;
+        // 速度ターゲットを決めて補間（見つかっていれば倍率を掛ける）
+        float targetSpeed = isDetected ? moveSpeed * detectedSpeedMultiplier : moveSpeed;
+        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, speedLerp * Time.deltaTime);
+
+        if (goalLockTimer > 0f)
+        {
+            goalLockTimer -= Time.deltaTime;
+        }
     }
 
     void FixedUpdate()
     {
         // 使用物理方式移动（会检测碰撞）
-        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
     }
 
     // 移動の入力と判定を行うメソッド
@@ -181,5 +208,18 @@ public class PlayerController : MonoBehaviour
         }
 
         Debug.Log("変装が解除された！");
+    }
+
+    // 公開API：敵側から発見/見失いを通知
+    public void SetDetected(bool detected)
+    {
+        // 立ち上がり（false -> true）で10秒ロック開始
+        if (!isDetected && detected)
+        {
+            goalLockTimer = goalLockSeconds;
+        }
+
+        // 状態が変わった時のみ切り替え（不要なら単純代入でOK）
+        isDetected = detected;
     }
 }
