@@ -24,10 +24,25 @@ public class PlayerController : MonoBehaviour
     [Header("見た目：向き別スプライト")]
     public Sprite frontSprite;        // 正面（デフォルト＆↓）
     public Sprite backSprite;         // 後ろ（↑）
+    public Sprite leftSprite;         // 左（←）
+    public Sprite rightSprite;        // 右（→）
     [Tooltip("向き切替のデッドゾーン（小さすぎる上下入力は無視）")]
     public float facingDeadZone = 0.1f;
+    private enum Facing { Front, Back, Left, Right }
+    private Facing lastFacing = Facing.Front;   // 初期は正面
 
     private SpriteRenderer sr;
+
+    [Header("検知タイマー")]
+    [Tooltip("スポットライトに入るたび延長される検知時間（秒）")]
+    public float detectionExtendSeconds = 10f;
+
+    [SerializeField] private float detectionTimeRemaining = 0f; // 検知残り時間（秒）
+    public bool IsDetectedNow => detectionTimeRemaining > 0f;   // 外部から読みやすく
+    // 検知中の速度倍率：通常は detectedSpeedMultiplier を使うが、
+    // 敵側が倍率を提示してきた場合は“期限付きオーバーライド”にできる
+    private float detectedMultiplierOverride = 0f;
+    private float overrideTimeRemaining = 0f;   // オーバーライド有効残り秒
 
     [Header("検知時のスピード設定")]
     [Tooltip("敵に見つかっている間の速度倍率")]
@@ -82,8 +97,14 @@ public class PlayerController : MonoBehaviour
         moveInput = new Vector2(moveX, moveY).normalized;
         // 组合为向量并归一化
         UpdateFacingByInput(moveInput);
+        // 検知タイマー減算
+        if (detectionTimeRemaining > 0f) detectionTimeRemaining -= Time.deltaTime;
+        if (overrideTimeRemaining > 0f) overrideTimeRemaining -= Time.deltaTime;
+        float detectedMul = (overrideTimeRemaining > 0f && detectedMultiplierOverride > 0f)
+                        ? detectedMultiplierOverride
+                        : detectedSpeedMultiplier;
         // 速度ターゲットを決めて補間（見つかっていれば倍率を掛ける）
-        float targetSpeed = isDetected ? moveSpeed * detectedSpeedMultiplier : moveSpeed;
+        float targetSpeed = IsDetectedNow ? moveSpeed * detectedSpeedMultiplier : moveSpeed;
         currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, speedLerp * Time.deltaTime);
 
         if (goalLockTimer > 0f)
@@ -131,16 +152,60 @@ public class PlayerController : MonoBehaviour
     {
         if (!sr) return;
 
-        // 上下入力でのみ切替。左右や停止時は仕様通り「正面」維持
-        if (input.y > facingDeadZone)
+        float ax = Mathf.Abs(input.x);
+        float ay = Mathf.Abs(input.y);
+
+        // 入力が小さければデフォルト正面
+        if (ax < facingDeadZone && ay < facingDeadZone)
         {
-            // 上へ：後ろ姿
-            if (backSprite && sr.sprite != backSprite) sr.sprite = backSprite;
+            ApplyFacingSprite(lastFacing);
+            return;
+        }
+
+        // どちらの成分が大きいかで軸優先（斜め対策）
+        if (ay >= ax)
+        {
+            // 縦優先
+            if (input.y > facingDeadZone)
+            {
+                lastFacing = Facing.Back; // ↑ 後ろ
+            }
+            else if (input.y < -facingDeadZone)
+            {
+                lastFacing = Facing.Front; // ↓ 正面
+            }
         }
         else
         {
-            // デフォルト＆下/停止：正面
-            if (frontSprite && sr.sprite != frontSprite) sr.sprite = frontSprite;
+            // 横優先
+            if (input.x > facingDeadZone)
+            {
+                lastFacing = Facing.Right; // → 右
+            }
+            else if (input.x < -facingDeadZone)
+            {
+                lastFacing = Facing.Left;   // ← 左
+            }
+        }
+        ApplyFacingSprite(lastFacing);
+    }
+
+    private void ApplyFacingSprite(Facing f)
+    {
+        switch (f)
+        {
+            case Facing.Back:
+                if (backSprite && sr.sprite != backSprite) sr.sprite = backSprite;
+                break;
+            case Facing.Left:
+                if (leftSprite && sr.sprite != leftSprite) sr.sprite = leftSprite;
+                break;
+            case Facing.Right:
+                if (rightSprite && sr.sprite != rightSprite) sr.sprite = rightSprite;
+                break;
+            default: // Front
+                if (frontSprite && sr.sprite != frontSprite) sr.sprite = frontSprite;
+                break;
         }
     }
 
@@ -200,22 +265,54 @@ public class PlayerController : MonoBehaviour
         Debug.Log("変装が解除された！");
     }
 
-    // 公開API：敵側から発見/見失いを通知
+    // 旧仕様互換のための状態保持（立ち上がり検出用）
+    private bool _prevDetectedSignal = false;
+
+    /// <summary>
+    /// 旧API互換：毎フレームの detected 信号を受け取るが、
+    /// 「false→true の立ち上がり」の瞬間にだけ 10秒延長する。
+    /// speedMultiplier は >0 のときだけ“一時上書き”として seconds の間だけ適用。
+    /// </summary>
     public void SetDetected(bool detected, float speedMultiplier = -1f)
     {
-        // 立ち上がり（false -> true）で10秒ロック開始
-        if (!isDetected && detected)
+        // 立ち上がり（false→true）の瞬間だけ延長
+        if (detected && !_prevDetectedSignal)
+        {
+            if (speedMultiplier > 0f)
+                AddDetectionTimeWithMultiplier(detectionExtendSeconds, speedMultiplier);
+            else
+                AddDetectionTime(detectionExtendSeconds);
+        }
+
+        // 次回比較用に保存（※速度ON/OFFの判定には IsDetectedNow を使います）
+        _prevDetectedSignal = detected;
+    }
+
+    /// <summary>
+    /// スポットライトに「入った瞬間」に敵側から呼ぶ。seconds 秒ぶん検知を延長。
+    /// </summary>
+    public void AddDetectionTime(float seconds)
+    {
+        bool wasDetected = IsDetectedNow;
+
+        // 仕様：延長は「加算」。累積していく
+        detectionTimeRemaining += Mathf.Max(0f, seconds);
+
+        // 立ち上がり（未検知→検知）でゴールロックを開始（従来仕様維持）
+        if (!wasDetected && IsDetectedNow)
         {
             goalLockTimer = goalLockSeconds;
         }
+    }
 
-        // 警备员追逐玩家时的玩家速度，默认0表示玩家速度不变更，超过0的数字表示玩家速度倍率
-        if (speedMultiplier >= 0f)
+    // 侵入瞬間で延長＋倍率一時上書き
+    public void AddDetectionTimeWithMultiplier(float seconds, float multiplier)
+    {
+        AddDetectionTime(seconds);
+        if (multiplier > 0f)
         {
-            detectedSpeedMultiplier = speedMultiplier;
+            detectedMultiplierOverride = Mathf.Max(detectedMultiplierOverride, multiplier);
+            overrideTimeRemaining += Mathf.Max(0f, seconds);
         }
-
-        // 状態が変わった時のみ切り替え（不要なら単純代入でOK）
-        isDetected = detected;
     }
 }

@@ -28,6 +28,10 @@ public class EnemyPatrol1 : MonoBehaviour
 
     private bool gameEnded = false; // 防止重复触发游戏结束
 
+    [Header("検知延長（侵入で加算）")]
+    public float detectionExtendSeconds = 10f;   // 追加：スポットライト侵入で延長する秒数
+    private bool wasSeeing = false;              // 追加：前フレーム視認状態
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -42,25 +46,19 @@ public class EnemyPatrol1 : MonoBehaviour
 
         // 実視認（距離・角度・遮蔽・変装）で判定
         bool canSeeNow = PlayerInSight();
-        if (canSeeNow) lastSeenTime = Time.time;
-
-        // 猶予込みの"追跡状態"を決める（チラつき対策）
-        bool chasing = canSeeNow || (Time.time - lastSeenTime <= loseSightGrace);
-
-        // ★ プレイヤーへ検知状態を通知（ここが速度アップのトリガ）
-        // 警备员追逐玩家时的玩家速度，默认0表示玩家速度不变更，超过0的数字表示玩家速度倍率
-        if (playerSpeedMultiplier > 0f)
+        // ★ 侵入の“立ち上がり”で一度だけ検知延長（＆倍率上書きがあれば同時適用）
+        if (canSeeNow && !wasSeeing)
         {
-            playerController.SetDetected(chasing, playerSpeedMultiplier);
+            if (playerSpeedMultiplier > 0f)
+                playerController.AddDetectionTimeWithMultiplier(detectionExtendSeconds, playerSpeedMultiplier);
+            else
+                playerController.AddDetectionTime(detectionExtendSeconds);
         }
-        else
-        {
-            playerController.SetDetected(chasing);
-        }
+        wasSeeing = canSeeNow;
 
+        // （ゲームオーバー用）実視認のみで積算
         if (canSeeNow)
         {
-            // ゲームオーバー用の"連続可視時間"は猶予なしの実視認で積算
             playerVisibleTimer += Time.deltaTime;
             if (playerVisibleTimer >= gameOverTime)
             {
@@ -73,11 +71,12 @@ public class EnemyPatrol1 : MonoBehaviour
             playerVisibleTimer = 0f;
         }
 
-        // 行動
-        if (chasing)
-            ChasePlayer();
-        else
-            Patrol();
+        // 追跡状態（見失い猶予込み）
+        if (canSeeNow) lastSeenTime = Time.time;
+        bool chasing = canSeeNow || (Time.time - lastSeenTime <= loseSightGrace);
+
+        if (chasing) ChasePlayer();
+        else Patrol();
     }
 
     private void Patrol()
