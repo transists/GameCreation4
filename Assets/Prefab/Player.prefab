@@ -102,13 +102,18 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 8
-  disguisedColor: {r: 0, g: 1, b: 1, a: 1}
+  disguisedColor: {r: 1, g: 1, b: 1, a: 1}
   disguiseDuration: 10
   moveSpeed: 2.5
+  spriteRendererTarget: {fileID: 0}
   frontSprite: {fileID: 21300000, guid: ca2d052fcbb1339459b7d7912b8be2f7, type: 3}
   backSprite: {fileID: 21300000, guid: 58c89942d48aae647a32cfd89f98bab3, type: 3}
   leftSprite: {fileID: 21300000, guid: b1d225f5f9457044aad111cfb40529c2, type: 3}
   rightSprite: {fileID: 21300000, guid: 6327c97311639d547851dd40e540d506, type: 3}
+  disguiseFrontSprite: {fileID: 21300000, guid: 000d037d28b13094882ef8f2b51eca9d, type: 3}
+  disguiseBackSprite: {fileID: 21300000, guid: e9f8859e22f5fc843a9c3566e0ce91f0, type: 3}
+  disguiseLeftSprite: {fileID: 21300000, guid: 7581303ed9730d74d9d7e2750c09199a, type: 3}
+  disguiseRightSprite: {fileID: 21300000, guid: 7f1e4e4e81f6a8d4186188ace5be3f43, type: 3}
   facingDeadZone: 0.1
   detectionExtendSeconds: 10
   detectionTimeRemaining: 0

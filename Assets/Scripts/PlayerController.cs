@@ -16,22 +16,27 @@ public class PlayerController : MonoBehaviour
     // --- ↓ここからグリッド移動用のコード ---
     public float moveSpeed = 2.5f; // 1マスを移動する速さ
     //private bool isMoving = false; // 移動中かどうかのフラグ
-    private Vector3 targetPosition; // 目標地点
+    //private Vector3 targetPosition; // 目標地点
     private Rigidbody2D rb;
     private Vector2 moveInput;
     // --- ↑ここまでグリッド移動用のコード ---
-
+    [Header("見た目の出力ターゲット")]
+    public SpriteRenderer spriteRendererTarget; // 実際に描画しているSRをドラッグ推奨
     [Header("見た目：向き別スプライト")]
     public Sprite frontSprite;        // 正面（デフォルト＆↓）
     public Sprite backSprite;         // 後ろ（↑）
     public Sprite leftSprite;         // 左（←）
     public Sprite rightSprite;        // 右（→）
+    [Header("見た目：向き別スプライト（変装）")]
+    public Sprite disguiseFrontSprite;
+    public Sprite disguiseBackSprite;
+    public Sprite disguiseLeftSprite;
+    public Sprite disguiseRightSprite;
     [Tooltip("向き切替のデッドゾーン（小さすぎる上下入力は無視）")]
     public float facingDeadZone = 0.1f;
     private enum Facing { Front, Back, Left, Right }
     private Facing lastFacing = Facing.Front;   // 初期は正面
 
-    private SpriteRenderer sr;
 
     [Header("検知タイマー")]
     [Tooltip("スポットライトに入るたび延長される検知時間（秒）")]
@@ -56,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
     private float goalLockTimer = 0f;
     public bool CanGoal => goalLockTimer <= 0f;
-
+    public float GoalLockRemaining => Mathf.Max(0f, goalLockTimer);
     // 内部状態
     private bool isDetected = false;
     public float currentSpeed;
@@ -65,21 +70,36 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (sr) originalColor = sr.color; // 開始時の色を記憶
+        if (spriteRendererTarget) originalColor = spriteRendererTarget.color; // 開始時の色を記憶
         // 現在位置から一番近いタイルの中心にスナップさせる
         float x = Mathf.Floor(transform.position.x) + 0.5f;
         float y = Mathf.Floor(transform.position.y) + 0.5f;
         transform.position = new Vector3(x, y, 0);
 
-        // 移動の目標地点も初期化しておく
-        targetPosition = transform.position;
         currentSpeed = moveSpeed; // 現在速度を基準速度から開始
+        ApplyFacingSprite(lastFacing); // 初期表示
     }
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponentInChildren<SpriteRenderer>();
+        if (!spriteRendererTarget)
+        {
+            // 子も含めて“本体っぽい”SRを拾う（任意の自動補助）
+            var all = GetComponentsInChildren<SpriteRenderer>(true);
+            if (all != null && all.Length > 0)
+            {
+                SpriteRenderer best = null;
+                int bestOrder = int.MinValue;
+                foreach (var sr in all)
+                {
+                    var n = sr.name.ToLower();
+                    if (n.Contains("shadow") || n.Contains("fx") || n.Contains("effect")) continue;
+                    if (sr.sortingOrder >= bestOrder) { best = sr; bestOrder = sr.sortingOrder; }
+                }
+                spriteRendererTarget = best ?? all[0];
+            }
+        }
     }
 
     // Update is called once per frame
@@ -110,6 +130,21 @@ public class PlayerController : MonoBehaviour
         if (goalLockTimer > 0f)
         {
             goalLockTimer -= Time.deltaTime;
+        }
+
+        if (IsDisguised && spriteRendererTarget)
+        {
+            // lastFacingに対応した変装スプライトを毎フレーム強制適用
+            Sprite forced = null;
+            switch (lastFacing)
+            {
+                case Facing.Back: forced = disguiseBackSprite ? disguiseBackSprite : backSprite; break;
+                case Facing.Left: forced = disguiseLeftSprite ? disguiseLeftSprite : leftSprite; break;
+                case Facing.Right: forced = disguiseRightSprite ? disguiseRightSprite : rightSprite; break;
+                default: forced = disguiseFrontSprite ? disguiseFrontSprite : frontSprite; break;
+            }
+            if (forced && spriteRendererTarget.sprite != forced)
+                spriteRendererTarget.sprite = forced;
         }
     }
 
@@ -150,7 +185,7 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateFacingByInput(Vector2 input)
     {
-        if (!sr) return;
+        if (!spriteRendererTarget) return;
 
         float ax = Mathf.Abs(input.x);
         float ay = Mathf.Abs(input.y);
@@ -192,21 +227,31 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyFacingSprite(Facing f)
     {
+        if (!spriteRendererTarget) return;
+
+        bool disguised = IsDisguised;
+
+        Sprite Choose(Sprite normal, Sprite disguise)
+            => disguised ? (disguise != null ? disguise : normal) : normal;
+
+        Sprite target = null;
         switch (f)
         {
             case Facing.Back:
-                if (backSprite && sr.sprite != backSprite) sr.sprite = backSprite;
+                if (backSprite && spriteRendererTarget.sprite != backSprite) spriteRendererTarget.sprite = backSprite;
                 break;
             case Facing.Left:
-                if (leftSprite && sr.sprite != leftSprite) sr.sprite = leftSprite;
+                if (leftSprite && spriteRendererTarget.sprite != leftSprite) spriteRendererTarget.sprite = leftSprite;
                 break;
             case Facing.Right:
-                if (rightSprite && sr.sprite != rightSprite) sr.sprite = rightSprite;
+                if (rightSprite && spriteRendererTarget.sprite != rightSprite) spriteRendererTarget.sprite = rightSprite;
                 break;
             default: // Front
-                if (frontSprite && sr.sprite != frontSprite) sr.sprite = frontSprite;
+                if (frontSprite && spriteRendererTarget.sprite != frontSprite) spriteRendererTarget.sprite = frontSprite;
                 break;
         }
+        // 常に代入（上位の仕組みで上書きされていないことを担保）
+        if (target != null) spriteRendererTarget.sprite = target;
     }
 
     private bool IsValidMove(Vector3 targetPos)
@@ -238,8 +283,8 @@ public class PlayerController : MonoBehaviour
         canUseDisguise = false;
 
         // 見た目を変える（例：色を変える）
-        if (sr) sr.color = disguisedColor;
-
+        if (spriteRendererTarget) spriteRendererTarget.color = disguisedColor;
+        ApplyFacingSprite(lastFacing); // 即反映
         StartCoroutine(DisguiseTimerCoroutine());
         Debug.Log("変装した！ 10秒後に解除されます。");
     }
@@ -260,8 +305,8 @@ public class PlayerController : MonoBehaviour
         IsDisguised = false;
 
         // 色を元の色に戻す
-        if (sr) sr.color = originalColor;
-
+        if (spriteRendererTarget) spriteRendererTarget.color = originalColor;
+        ApplyFacingSprite(lastFacing); // 即反映
         Debug.Log("変装が解除された！");
     }
 
