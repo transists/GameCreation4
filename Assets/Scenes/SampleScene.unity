@@ -445,6 +445,26 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
+  - first: {x: -1, y: -2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 0
+      m_TileSpriteIndex: 1
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 0, y: -2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 0
+      m_TileSpriteIndex: 1
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
   - first: {x: 8, y: -2, z: 0}
     second:
       serializedVersion: 2
@@ -897,17 +917,17 @@ Tilemap:
       m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
-  - m_RefCount: 68
+  - m_RefCount: 70
     m_Data: {fileID: 11400000, guid: c3ca2e3187d0b484186f14bc56209161, type: 2}
   - m_RefCount: 0
     m_Data: {fileID: 0}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 68
+  - m_RefCount: 70
     m_Data: {fileID: 21300000, guid: 551a1d454211b464282e79d8abf409f9, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 68
+  - m_RefCount: 70
     m_Data:
       e00: 1
       e01: 0
@@ -926,7 +946,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 68
+  - m_RefCount: 70
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   - m_RefCount: 0
     m_Data: {r: 8.7427e-41, g: 8.7427e-41, b: 8.7427e-41, a: 8.7427e-41}
@@ -1089,7 +1109,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &599056391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1172,6 +1192,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   swingAngle: 30
   speed: 1
+  detectionRadius: 5
+  detectionAngle: 90
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  affectedEnemies: []
 --- !u!1 &875554802
 GameObject:
   m_ObjectHideFlags: 0
@@ -2867,11 +2893,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4391644549488793044, guid: b1ff31da47e5cf346a42c1866406660b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.79
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 4391644549488793044, guid: b1ff31da47e5cf346a42c1866406660b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.56
+      value: -0.08
       objectReference: {fileID: 0}
     - target: {fileID: 4391644549488793044, guid: b1ff31da47e5cf346a42c1866406660b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2932,7 +2958,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3786283872133586886, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.09
+      value: 0.79
       objectReference: {fileID: 0}
     - target: {fileID: 3786283872133586886, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2969,6 +2995,10 @@ PrefabInstance:
     - target: {fileID: 8129048590566402511, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
       propertyPath: m_Name
       value: Light_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8129048590566402511, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3023,6 +3053,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2440580765360603975, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3472397184478678276, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
       propertyPath: playerController
       value: 
@@ -3035,6 +3069,10 @@ PrefabInstance:
       propertyPath: playerController
       value: 
       objectReference: {fileID: 1187204328}
+    - target: {fileID: 8955623431193797723, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
+      propertyPath: detectedSpeedMultiplier
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

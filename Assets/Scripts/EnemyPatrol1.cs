@@ -32,6 +32,18 @@ public class EnemyPatrol1 : MonoBehaviour
     public float detectionExtendSeconds = 10f;   // 追加：スポットライト侵入で延長する秒数
     private bool wasSeeing = false;              // 追加：前フレーム視認状態
 
+    [Header("灯光检测速度设置")]
+    [Tooltip("玩家进入LightSwing范围时，敌人移动速度的倍率")]
+    public float detectedSpeedMultiplier = 1.5f;
+    [Tooltip("灯光检测后的持续时间（秒），可配置")]
+    public float lightDetectionDuration = 10f;
+    [Tooltip("当玩家再次进入灯光范围时，延长的秒数（可配置）")]
+    public float lightDetectionExtendSeconds = 10f;
+    
+    private float lightDetectionTimer = 0f;      // 灯光检测计时器
+    private float originalMoveSpeed;             // 保存原始移动速度
+    private float originalChaseSpeed;            // 保存原始追逐速度
+
     [Header("見た目：向き別スプライト")]
     public Sprite frontSprite;        // 正面（デフォルト＆↓）
     public Sprite backSprite;         // 後ろ（↑）
@@ -65,6 +77,10 @@ public class EnemyPatrol1 : MonoBehaviour
 		    // fieldOfView会在移动时根据方向自动旋转
 		    // 初始时可以设置为向上，或者保持当前旋转
 		}
+		
+		// 保存原始速度
+		originalMoveSpeed = moveSpeed;
+		originalChaseSpeed = chaseSpeed;
 	}
 
     void Update()
@@ -73,9 +89,12 @@ public class EnemyPatrol1 : MonoBehaviour
         if (playerController == null || playerController.transform == null || fieldOfView == null) return;
         if (gameEnded) return; // 如果游戏已结束，不再执行后续逻辑
 
+        // 更新灯光检测计时器
+        UpdateLightDetectionTimer();
+
         // 実視認（距離・角度・遮蔽・変装）で判定
         bool canSeeNow = PlayerInSight();
-        // ★ 侵入の“立ち上がり”で一度だけ検知延長（＆倍率上書きがあれば同時適用）
+        // ★ 侵入の"立ち上がり"で一度だけ検知延長（＆倍率上書きがあれば同時適用）
         if (canSeeNow && !wasSeeing)
         {
             if (playerSpeedMultiplier > 0f)
@@ -106,6 +125,63 @@ public class EnemyPatrol1 : MonoBehaviour
 
         if (chasing) ChasePlayer();
         else Patrol();
+    }
+    
+    /// <summary>
+    /// 更新灯光检测计时器
+    /// </summary>
+    private void UpdateLightDetectionTimer()
+    {
+        // 如果计时器还在运行，递减计时器
+        if (lightDetectionTimer > 0f)
+        {
+            lightDetectionTimer -= Time.deltaTime;
+            
+            // 如果计时器结束，恢复原始速度
+            if (lightDetectionTimer <= 0f)
+            {
+                lightDetectionTimer = 0f;
+                RestoreOriginalSpeed();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 当玩家被灯光检测到时调用（由LightSwing调用）
+    /// </summary>
+    public void OnPlayerDetectedByLight()
+    {
+        // 如果计时器已经在运行，延长计时器
+        if (lightDetectionTimer > 0f)
+        {
+            lightDetectionTimer += lightDetectionExtendSeconds;
+        }
+        else
+        {
+            // 如果计时器未运行，启动计时器
+            lightDetectionTimer = lightDetectionDuration;
+        }
+        
+        // 应用速度倍率
+        ApplySpeedMultiplier();
+    }
+    
+    /// <summary>
+    /// 应用速度倍率
+    /// </summary>
+    private void ApplySpeedMultiplier()
+    {
+        moveSpeed = originalMoveSpeed * detectedSpeedMultiplier;
+        chaseSpeed = originalChaseSpeed * detectedSpeedMultiplier;
+    }
+    
+    /// <summary>
+    /// 恢复原始速度
+    /// </summary>
+    private void RestoreOriginalSpeed()
+    {
+        moveSpeed = originalMoveSpeed;
+        chaseSpeed = originalChaseSpeed;
     }
 
     private void Patrol()
