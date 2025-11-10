@@ -62,10 +62,9 @@ public class EnemyPatrol1 : MonoBehaviour
 		// 这里可以根据需要设置初始朝向，比如向上
 		if (fieldOfView != null)
 		{
-            // fieldOfView会在移动时根据方向自动旋转
-            // 初始时可以设置为向上，或者保持当前旋转
-            frontSprite = spriteRenderer.sprite;
-        }
+		    // fieldOfView会在移动时根据方向自动旋转
+		    // 初始时可以设置为向上，或者保持当前旋转
+		}
 	}
 
     void Update()
