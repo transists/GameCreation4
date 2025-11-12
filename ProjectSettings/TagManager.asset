@@ -42,3 +42,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: DarkOnly
+    uniqueID: 4055533243
+    locked: 0
+  - name: World
+    uniqueID: 2641342139
+    locked: 0
+  - name: UI
+    uniqueID: 3937939591
+    locked: 0

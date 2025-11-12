@@ -1198,6 +1198,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   affectedEnemies: []
+  directionOffset: 0
 --- !u!1 &875554802
 GameObject:
   m_ObjectHideFlags: 0
@@ -2822,6 +2823,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4031f3a5f2c9de645b962b656593fa7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1477788260 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8955623431193797723, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
+  m_PrefabInstance: {fileID: 8452669758850377519}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1fe3043cce170048bb0a0fdf0b5d673, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2658002823208836130
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3000,6 +3012,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8644140783531308841, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: affectedEnemies.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8644140783531308841, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: affectedEnemies.Array.data[0]
+      value: 
+      objectReference: {fileID: 1477788260}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3055,7 +3075,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2440580765360603975, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3472397184478678276, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
       propertyPath: playerController
@@ -3066,12 +3086,16 @@ PrefabInstance:
       value: Enemy_1
       objectReference: {fileID: 0}
     - target: {fileID: 8955623431193797723, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
+      propertyPath: chaseSpeed
+      value: 4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8955623431193797723, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
       propertyPath: playerController
       value: 
       objectReference: {fileID: 1187204328}
     - target: {fileID: 8955623431193797723, guid: aa3cecab8cfe6af4db38ad39fc50a7a8, type: 3}
       propertyPath: detectedSpeedMultiplier
-      value: 4
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
