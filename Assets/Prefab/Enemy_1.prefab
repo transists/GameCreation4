@@ -191,7 +191,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 198980786855066893}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1fe3043cce170048bb0a0fdf0b5d673, type: 3}
   m_Name: 
@@ -238,7 +238,7 @@ MonoBehaviour:
   shotSE: {fileID: 0}
   gameOverTime: 2
   loseSightGrace: 0.3
-  detectionExtendSeconds: 10
+  detectionExtendSeconds: 5
   detectedSpeedMultiplier: 1.5
   lightDetectionDuration: 10
   lightDetectionExtendSeconds: 10

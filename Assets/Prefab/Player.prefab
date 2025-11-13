@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7351552864113045120}
   - component: {fileID: 8234363237533229170}
   - component: {fileID: 7299065590000930300}
+  - component: {fileID: 6479211018841652244}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -55,7 +56,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 36fe67cf9706aef4c8a357fcb98c59a1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -73,8 +74,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1653625157
+  m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: ca2d052fcbb1339459b7d7912b8be2f7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -115,11 +116,20 @@ MonoBehaviour:
   disguiseLeftSprite: {fileID: 21300000, guid: 7581303ed9730d74d9d7e2750c09199a, type: 3}
   disguiseRightSprite: {fileID: 21300000, guid: 7f1e4e4e81f6a8d4186188ace5be3f43, type: 3}
   facingDeadZone: 0.1
-  detectionExtendSeconds: 10
+  footstepLoopNormal: {fileID: 8300000, guid: a0bf48d817916bd49aa4948daae771e9, type: 3}
+  footstepLoopDetected: {fileID: 8300000, guid: 30483acffdc8f234b992fcb7269a218a, type: 3}
+  footstepVolume: 0.6
+  moveSfxThreshold: 0.05
+  disguiseSE: {fileID: 8300000, guid: 7c1744c5c82528844ad4ef6c71254e1e, type: 3}
+  disguiseVolume: 1
+  detectionExtendSeconds: 5
   detectionTimeRemaining: 0
   detectedSpeedMultiplier: 2
   speedLerp: 12
-  goalLockSeconds: 10
+  detectedStateLoop: {fileID: 8300000, guid: 7079ca06b9701764ba336f21f9179b83, type: 3}
+  detectedStateVolume: 0.7
+  detectedFadeSeconds: 0.15
+  goalLockSeconds: 5
   currentSpeed: 0
 --- !u!61 &8234363237533229170
 BoxCollider2D:
@@ -193,3 +203,99 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!82 &6479211018841652244
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6705081114941016599}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

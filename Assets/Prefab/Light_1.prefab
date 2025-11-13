@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3786283872133586886}
   - component: {fileID: 8071978465248507323}
   - component: {fileID: 8644140783531308841}
+  - component: {fileID: -5825866257701245423}
   m_Layer: 0
   m_Name: Light_1
   m_TagString: Untagged
@@ -67,8 +68,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: -2.5878, y: -0.06830001, z: 0}
-    m_Extent: {x: 3.0512, y: 3.8397, z: 0}
+    m_Center: {x: -2.583, y: -0.04460001, z: 0}
+    m_Extent: {x: 3.0564, y: 2.9603, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
@@ -79,13 +80,13 @@ MonoBehaviour:
   m_ShapeLightFalloffSize: 0.5
   m_ShapeLightFalloffOffset: {x: 0, y: 0}
   m_ShapePath:
-  - {x: -3.5891669, y: -3.4070973, z: 0}
+  - {x: -4.1297073, y: -2.506196, z: 0}
   - {x: -0.036443744, y: -0.44952905, z: 0}
-  - {x: -0.07071581, y: 0.4661034, z: 0}
-  - {x: -3.732995, y: 3.272161, z: 0}
-  - {x: -4.6577373, y: 1.7290092, z: 0.000000067055225}
-  - {x: -5.141398, y: 0.14460531, z: 0.000000067055225}
-  - {x: -4.7744837, y: -1.6732904, z: 0.000000067055225}
+  - {x: -0.025669357, y: 0.4210587, z: 0}
+  - {x: -4.093355, y: 2.4163055, z: 0}
+  - {x: -4.747827, y: 1.3686488, z: 0.000000067055225}
+  - {x: -5.141398, y: 0.009470188, z: 0.000000067055225}
+  - {x: -4.7294383, y: -1.4030201, z: 0.000000067055225}
 --- !u!114 &8644140783531308841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,5 +106,30 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
+  affectedEnemies: []
+  directionOffset: 0
+--- !u!114 &-5825866257701245423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8129048590566402511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9b2c69d73cba544499d3fb703a96d6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swingAngle: 30
+  speed: 1
+  detectionRadius: 5
+  detectionAngle: 90
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  respectDisguise: 0
+  addDetectSeconds: 5
+  stayToGameOverSeconds: 2
+  gameOverSceneName: GameOver
   affectedEnemies: []
   directionOffset: 0

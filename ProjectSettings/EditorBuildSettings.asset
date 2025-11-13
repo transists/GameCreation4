@@ -5,16 +5,25 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    guid: dcb5d48c242938246915f75b948bf2c2
+  - enabled: 1
+    path: Assets/Scenes/taitoru.unity
+    guid: 5ae098ddc5afa8043871c1d12868807a
+  - enabled: 1
+    path: Assets/Scenes/Stage1.unity
+    guid: b62aeb4014d1b2541837dad85d20e624
+  - enabled: 1
+    path: Assets/Scenes/Stage2.unity
+    guid: 9a68917b5b521ac4aae8d7d6d46befa5
+  - enabled: 1
+    path: Assets/Scenes/Stage3.unity
+    guid: 5dc0b8c8c093be945b8d7e4dadac9a93
   - enabled: 1
     path: Assets/Scenes/GameOver.unity
     guid: 611c1ede4e430174398dd7ab66717c36
   - enabled: 1
     path: Assets/Scenes/Goal.unity
     guid: 2856e2f46f3c045468eca65f9033dd6c
-  - enabled: 1
-    path: Assets/Scenes/taitoru.unity
-    guid: 5ae098ddc5afa8043871c1d12868807a
   m_configObjects: {}

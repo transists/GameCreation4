@@ -6,11 +6,13 @@ using UnityEngine.SceneManagement;
 public class TItleManager : MonoBehaviour
 {
     public string nextSceneName = "";
+    AudioSource SE;
+    public AudioClip enter;
     
     // Start is called before the first frame update
     void Start()
     {
-        
+        SE = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -19,7 +21,13 @@ public class TItleManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space)) // Aボタン or Spaceキーで開始
         {
-            SceneManager.LoadScene(nextSceneName);
+            SE.PlayOneShot(enter);
+            Invoke("EnterGame", 1f);
         }
+    }
+
+    void EnterGame()
+    {
+        SceneManager.LoadScene(nextSceneName);
     }
 }
