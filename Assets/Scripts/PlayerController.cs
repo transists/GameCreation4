@@ -37,6 +37,21 @@ public class PlayerController : MonoBehaviour
     private enum Facing { Front, Back, Left, Right }
     private Facing lastFacing = Facing.Front;   // 初期は正面
 
+    // === 足音/SE ===
+    [Header("サウンド：足音・SE")]
+    public AudioClip footstepLoopNormal;      // 通常移動の足音（継ぎ目のないループ素材）
+    public AudioClip footstepLoopDetected;    // 検知中の足音（テンポ強め/違う質感）
+    [Range(0f, 1f)] public float footstepVolume = 0.6f;
+    [Tooltip("移動とみなす速度しきい値（これ未満で足音停止）")]
+    public float moveSfxThreshold = 0.05f;
+
+    public AudioClip disguiseSE;              // 変装時のワンショットSE
+    [Range(0f, 1f)] public float disguiseVolume = 1.0f;
+
+    // 内部用：足音再生用のAudioSource（BGM等と混ざらない独立チャンネル）
+    private AudioSource footstepSource;
+    private bool footIsPlaying = false;
+    private bool lastFootIsDetected = false;  // 直前が検知足音かどうか
 
     [Header("検知タイマー")]
     [Tooltip("スポットライトに入るたび延長される検知時間（秒）")]
@@ -54,6 +69,14 @@ public class PlayerController : MonoBehaviour
     public float detectedSpeedMultiplier = 1.6f;
     [Tooltip("速度の補間係数（大きいほど素早く目標速度へ）")]
     public float speedLerp = 12f;
+
+    [Header("サウンド：検知状態ループ")]
+    public AudioClip detectedStateLoop;          // 検知中に鳴らし続けるループSE
+    [Range(0f, 1f)] public float detectedStateVolume = 0.7f;
+    public float detectedFadeSeconds = 0.15f;    // フェードIN/OUT時間
+
+    private AudioSource detectedStateSource;
+    private bool detectedLoopPlaying = false;
 
     [Header("ゴール制限")]
     [Tooltip("発見後ゴール不可の秒数")]
@@ -100,6 +123,25 @@ public class PlayerController : MonoBehaviour
                 spriteRendererTarget = best ?? all[0];
             }
         }
+
+        if (!footstepSource)
+        {
+            footstepSource = gameObject.AddComponent<AudioSource>();
+            footstepSource.loop = true;
+            footstepSource.playOnAwake = false;
+            footstepSource.spatialBlend = 0f; // 2D
+            footstepSource.volume = footstepVolume;
+        }
+
+        // 検知ループ用の専用AudioSourceを用意
+        if (!detectedStateSource)
+        {
+            detectedStateSource = gameObject.AddComponent<AudioSource>();
+            detectedStateSource.loop = true;
+            detectedStateSource.playOnAwake = false;
+            detectedStateSource.spatialBlend = 0f; // 2D
+            detectedStateSource.volume = 0f;       // フェードIN前提
+        }
     }
 
     // Update is called once per frame
@@ -118,21 +160,38 @@ public class PlayerController : MonoBehaviour
         // 组合为向量并归一化
         UpdateFacingByInput(moveInput);
         // 検知タイマー減算
-        if (detectionTimeRemaining > 0f) detectionTimeRemaining -= Time.deltaTime;
-        if (overrideTimeRemaining > 0f) overrideTimeRemaining -= Time.deltaTime;
+        if (detectionTimeRemaining > 0f)
+        {
+            detectionTimeRemaining -= Time.deltaTime;
+            if (detectionTimeRemaining < 0f) detectionTimeRemaining = 0f;
+        }
+        if (overrideTimeRemaining > 0f)
+        {
+            overrideTimeRemaining -= Time.deltaTime;
+            if (overrideTimeRemaining <= 0f)
+            {
+                overrideTimeRemaining = 0f;
+                detectedMultiplierOverride = 0f; // 期限切れで無効化
+            }
+        }
+
+        // 検知時の倍率（オーバーライドがあればそれを優先）
         float detectedMul = (overrideTimeRemaining > 0f && detectedMultiplierOverride > 0f)
-                        ? detectedMultiplierOverride
-                        : detectedSpeedMultiplier;
-        // 速度ターゲットを決めて補間（見つかっていれば倍率を掛ける）
-        float targetSpeed = IsDetectedNow ? moveSpeed * detectedSpeedMultiplier : moveSpeed;
+                            ? detectedMultiplierOverride
+                            : detectedSpeedMultiplier;
+
+        // 速度ターゲット（← detectedMul を使うよう修正）
+        float targetSpeed = IsDetectedNow ? moveSpeed * detectedMul : moveSpeed;
         currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, speedLerp * Time.deltaTime);
 
+        // ゴールロックもクランプ
         if (goalLockTimer > 0f)
         {
             goalLockTimer -= Time.deltaTime;
+            if (goalLockTimer < 0f) goalLockTimer = 0f;
         }
 
-        if (IsDisguised && spriteRendererTarget)
+        /*if (IsDisguised && spriteRendererTarget)
         {
             // lastFacingに対応した変装スプライトを毎フレーム強制適用
             Sprite forced = null;
@@ -145,7 +204,9 @@ public class PlayerController : MonoBehaviour
             }
             if (forced && spriteRendererTarget.sprite != forced)
                 spriteRendererTarget.sprite = forced;
-        }
+        }*/
+        UpdateFootstepAudio();  // ← これを最後の方で呼ぶだけ
+        UpdateDetectedLoop();   // ← 毎フレーム呼ぶ
     }
 
     void FixedUpdate()
@@ -154,34 +215,56 @@ public class PlayerController : MonoBehaviour
         rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
     }
 
-    // 移動の入力と判定を行うメソッド
-    /*private void HandleMovement()
+    private void UpdateFootstepAudio()
     {
-        if (isMoving) return;
+        // 実効移動速度（入力×currentSpeed）で判定
+        float movingSpeed = (moveInput * currentSpeed).magnitude;
 
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
+        bool isMoving = movingSpeed > moveSfxThreshold;
+        bool wantDetectedFoot = false;
 
-        Vector3 potentialTargetPosition = transform.position;
-        bool inputReceived = false;
+        // あなたのスクリプトに IsDetectedNow がある前提（なければ isDetected 等に置き換えてOK）
+        wantDetectedFoot = IsDetectedNow;
 
-        if (Mathf.Abs(horizontalInput) > 0.5f)
+        if (!isMoving)
         {
-            potentialTargetPosition += new Vector3(Mathf.Sign(horizontalInput), 0, 0);
-            inputReceived = true;
-        }
-        else if (Mathf.Abs(verticalInput) > 0.5f)
-        {
-            potentialTargetPosition += new Vector3(0, Mathf.Sign(verticalInput), 0);
-            inputReceived = true;
+            // 停止：足音OFF
+            if (footIsPlaying)
+            {
+                footstepSource.Stop();
+                footIsPlaying = false;
+            }
+            return;
         }
 
-        if (inputReceived && IsValidMove(potentialTargetPosition))
+        // ここまで来たら「動いている」
+        // 使うべきループクリップを選択
+        AudioClip desired = wantDetectedFoot ? footstepLoopDetected : footstepLoopNormal;
+
+        // クリップ未設定なら何もしない
+        if (!desired) return;
+
+        // クリップ変更が必要か？
+        bool needSwitch = (!footIsPlaying) || (footstepSource.clip != desired) || (lastFootIsDetected != wantDetectedFoot);
+
+        if (needSwitch)
         {
-            targetPosition = potentialTargetPosition;
-            isMoving = true;
+            // スムーズ切替：一瞬止めて差し替え → 再生
+            footstepSource.Stop();
+            footstepSource.clip = desired;
+            footstepSource.volume = footstepVolume;
+            footstepSource.Play();
+
+            footIsPlaying = true;
+            lastFootIsDetected = wantDetectedFoot;
         }
-    }*/
+        else
+        {
+            // 再生中なら音量を追従（Inspectorで変更したとき反映されるように）
+            footstepSource.volume = footstepVolume;
+        }
+    }
+
 
     private void UpdateFacingByInput(Vector2 input)
     {
@@ -229,29 +312,29 @@ public class PlayerController : MonoBehaviour
     {
         if (!spriteRendererTarget) return;
 
-        bool disguised = IsDisguised;
-
-        Sprite Choose(Sprite normal, Sprite disguise)
-            => disguised ? (disguise != null ? disguise : normal) : normal;
+        // 通常/変装をまとめて選ぶヘルパ
+        Sprite Pick(Sprite normal, Sprite disguise)
+            => IsDisguised ? (disguise ? disguise : normal) : normal;
 
         Sprite target = null;
         switch (f)
         {
             case Facing.Back:
-                if (backSprite && spriteRendererTarget.sprite != backSprite) spriteRendererTarget.sprite = backSprite;
+                target = Pick(backSprite, disguiseBackSprite);
                 break;
             case Facing.Left:
-                if (leftSprite && spriteRendererTarget.sprite != leftSprite) spriteRendererTarget.sprite = leftSprite;
+                target = Pick(leftSprite, disguiseLeftSprite);
                 break;
             case Facing.Right:
-                if (rightSprite && spriteRendererTarget.sprite != rightSprite) spriteRendererTarget.sprite = rightSprite;
+                target = Pick(rightSprite, disguiseRightSprite);
                 break;
             default: // Front
-                if (frontSprite && spriteRendererTarget.sprite != frontSprite) spriteRendererTarget.sprite = frontSprite;
+                target = Pick(frontSprite, disguiseFrontSprite);
                 break;
         }
-        // 常に代入（上位の仕組みで上書きされていないことを担保）
-        if (target != null) spriteRendererTarget.sprite = target;
+
+        if (target && spriteRendererTarget.sprite != target)
+            spriteRendererTarget.sprite = target;
     }
 
     private bool IsValidMove(Vector3 targetPos)
@@ -285,6 +368,7 @@ public class PlayerController : MonoBehaviour
         // 見た目を変える（例：色を変える）
         if (spriteRendererTarget) spriteRendererTarget.color = disguisedColor;
         ApplyFacingSprite(lastFacing); // 即反映
+        if (disguiseSE) AudioSource.PlayClipAtPoint(disguiseSE, transform.position, disguiseVolume);
         StartCoroutine(DisguiseTimerCoroutine());
         Debug.Log("変装した！ 10秒後に解除されます。");
     }
@@ -359,5 +443,84 @@ public class PlayerController : MonoBehaviour
             detectedMultiplierOverride = Mathf.Max(detectedMultiplierOverride, multiplier);
             overrideTimeRemaining += Mathf.Max(0f, seconds);
         }
+    }
+
+    private Coroutine detectedFadeCo;
+
+    private void UpdateDetectedLoop()
+    {
+        bool wantPlay = IsDetectedNow;
+
+        if (wantPlay && !detectedLoopPlaying)
+        {
+            StartDetectedLoop();
+        }
+        else if (!wantPlay && detectedLoopPlaying)
+        {
+            StopDetectedLoop();
+        }
+
+        // 追加の安全策：検知が切れているのに鳴っていたら確実に止める
+        if (!wantPlay && detectedStateSource)
+        {
+            if (detectedStateSource.isPlaying && detectedStateSource.volume <= 0.001f)
+                detectedStateSource.Stop();
+        }
+    }
+
+    private void StartDetectedLoop()
+    {
+        if (!detectedStateLoop) return;
+
+        detectedStateSource.clip = detectedStateLoop;
+        detectedStateSource.volume = 0f;
+        detectedStateSource.Play();
+        detectedLoopPlaying = true;
+
+        if (detectedFadeCo != null) StopCoroutine(detectedFadeCo);
+        detectedFadeCo = StartCoroutine(FadeVolume(detectedStateSource, 0f, detectedStateVolume, detectedFadeSeconds));
+    }
+
+    private void StopDetectedLoop()
+    {
+        if (!detectedLoopPlaying) return;
+
+        if (detectedFadeCo != null) StopCoroutine(detectedFadeCo);
+        detectedFadeCo = StartCoroutine(FadeOutAndStop(detectedStateSource, detectedFadeSeconds));
+        detectedLoopPlaying = false;
+    }
+
+    private System.Collections.IEnumerator FadeVolume(AudioSource src, float from, float to, float sec)
+    {
+        float t = 0f;
+        src.volume = from;
+        while (t < sec)
+        {
+            t += Time.deltaTime;
+            src.volume = Mathf.Lerp(from, to, t / sec);
+            yield return null;
+        }
+        src.volume = to;
+    }
+
+    private System.Collections.IEnumerator FadeOutAndStop(AudioSource src, float sec)
+    {
+        float from = src.volume;
+        float t = 0f;
+        while (t < sec)
+        {
+            t += Time.deltaTime;
+            src.volume = Mathf.Lerp(from, 0f, t / sec);
+            yield return null;
+        }
+        src.volume = 0f;
+        src.Stop();
+    }
+
+    void OnDisable()
+    {
+        if (footstepSource) { footstepSource.Stop(); }
+        if (detectedStateSource) { detectedStateSource.Stop(); }
+        detectedLoopPlaying = false;
     }
 }

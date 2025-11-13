@@ -8,7 +8,7 @@ public class GoalShieldController : MonoBehaviour
     [Header("参照")]
     public PlayerController player;           // シーンのプレイヤーをドラッグ
     public Collider2D shieldCollider;         // 子の CircleCollider2D（IsTrigger=false）
-    //public SpriteRenderer shieldVisual;       // 任意：見た目のリング
+    public SpriteRenderer shieldVisual;       // 任意：見た目のリング
 
     [Header("押し出し設定（任意）")]
     public float separationPadding = 0.001f;  // 少しだけ余裕を持たせる
@@ -20,7 +20,7 @@ public class GoalShieldController : MonoBehaviour
     {
         // 自動取得の補助（エディタ上でAdd時）
         shieldCollider = GetComponent<Collider2D>();
-        //shieldVisual = GetComponent<SpriteRenderer>();
+        shieldVisual = GetComponent<SpriteRenderer>();
     }
 
     // Start is called before the first frame update
@@ -47,7 +47,7 @@ public class GoalShieldController : MonoBehaviour
         if (shieldCollider.enabled != active)
         {
             shieldCollider.enabled = active;
-            //if (shieldVisual) shieldVisual.enabled = active;
+            if (shieldVisual) shieldVisual.enabled = active;
 
             if (active)
             {
