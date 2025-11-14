@@ -26,7 +26,7 @@ public class LightSwing2 : MonoBehaviour
     public string gameOverSceneName = "GameOver";
 
     [Header("“G’Ê’mi”CˆÓj")]
-    public EnemyPatrol1[] affectedEnemies;
+    public EnemyPatrol2[] affectedEnemies;
 
     [Header("ÆË•ûŒü‚Ì”÷’²®")]
     public float directionOffset = 0f;
@@ -46,7 +46,7 @@ public class LightSwing2 : MonoBehaviour
         if (playerObj) playerController = playerObj.GetComponent<PlayerController>();
 
         if (affectedEnemies == null || affectedEnemies.Length == 0)
-            affectedEnemies = FindObjectsOfType<EnemyPatrol1>();
+            affectedEnemies = FindObjectsOfType<EnemyPatrol2>();
     }
 
     // Update is called once per frame

@@ -4,28 +4,25 @@ using UnityEngine;
 /// 矩形＋前方突起だけで探知するFOV。見た目メッシュは作らず、Gizmosで可視化。
 /// 敵の前＝transform.up（このTransformの回転で方向が決まる）
 /// </summary>
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class EnemyFieldOfView2 : MonoBehaviour
 {
-    [Header("タイル基準サイズ")]
-    [Tooltip("1タイルのワールドサイズ（通常は1）")]
+    [Header("矩形FOV（タイル基準）")]
     public float tileSize = 1f;
-
-    [Header("探知矩形サイズ（タイル数）")]
-    [Tooltip("本体の矩形（幅,高さ）")]
-    public Vector2Int mainTiles = new Vector2Int(8, 8);
-    [Tooltip("前方の突起（幅,奥行） 例: (1,1) = 前1マスの正方形")]
-    public Vector2Int forwardTiles = new Vector2Int(3, 1);
-
-    [Header("遮蔽物オプション")]
-    [Tooltip("壁で視線が遮られたら不可視にする")]
-    public bool clipByObstacles = true;
+    public int forwardTiles = 6;   // 前方に6マス
+    public int sideTiles = 2;      // 左右に2マス（幅は 2*side+1 マス相当）
+    [Header("遮蔽（壁）")]
     public LayerMask obstacleMask;
+
+    private Mesh mesh;
 
     /// <summary>ワールド座標の点が探知範囲に入っているか？</summary>
 
     void Start()
     {
-        
+        mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+        RebuildMesh();
     }
 
     void LateUpdate()
@@ -33,69 +30,80 @@ public class EnemyFieldOfView2 : MonoBehaviour
         
     }
 
-    /// <summary>ワールド座標の点が探知範囲に入っているか？</summary>
-    public bool ContainsPoint(Vector2 worldPos)
+    /// <summary>敵本体から毎フレ呼ぶ：位置と前方を合わせる</summary>
+    public void SetPose(Vector2 pos, Vector2 forward)
     {
-        // ローカル座標へ（このTransformのupが“前”）
-        Vector2 p = transform.InverseTransformPoint(worldPos);
+        transform.SetPositionAndRotation(
+            pos,
+            Quaternion.FromToRotation(Vector2.up, forward.normalized)
+        );
+    }
 
-        // タイル → ワールド寸法
-        Vector2 mainSize = new Vector2(mainTiles.x * tileSize, mainTiles.y * tileSize);
-        Vector2 forwardSize = new Vector2(forwardTiles.x * tileSize, forwardTiles.y * tileSize);
+    /// <summary>矩形FOV内判定（原点origin、前方forward、ターゲットtarget）</summary>
+    public bool Contains(Vector2 origin, Vector2 forward, Vector2 target, float padding = 0f)
+    {
+        Vector2 f = forward.normalized;
+        Vector2 r = new Vector2(f.y, -f.x); // 右向き（up→right）
 
-        // 本体矩形：中心原点
-        Vector2 halfMain = mainSize * 0.5f;
-        bool inMain =
-            Mathf.Abs(p.x) <= halfMain.x &&
-            Mathf.Abs(p.y) <= halfMain.y;
+        Vector2 to = target - origin;
+        float z = Vector2.Dot(to, f);   // 前後
+        float x = Vector2.Dot(to, r);   // 左右
 
-        // 前方突起：中心を+Y（前）へオフセット
-        Vector2 halfFwd = forwardSize * 0.5f;
-        float fwdCenterY = halfMain.y + halfFwd.y;
-        bool inForward =
-            Mathf.Abs(p.x) <= halfFwd.x &&
-            p.y >= (fwdCenterY - halfFwd.y) && p.y <= (fwdCenterY + halfFwd.y);
+        float depth = forwardTiles * tileSize + padding;
+        float halfWidth = (sideTiles + 0.5f) * tileSize + padding; // 中央列も含めて少し余裕
 
-        if (!(inMain || inForward)) return false;
+        if (z < 0f || z > depth) return false;          // 後ろ/遠すぎ
+        if (Mathf.Abs(x) > halfWidth) return false;     // 横にはみ出し
 
-        // 壁で遮る
-        if (clipByObstacles)
-        {
-            Vector2 origin = transform.position;
-            Vector2 toP = worldPos - origin;
-            if (Physics2D.Raycast(origin, toP.normalized, toP.magnitude, obstacleMask))
-                return false;
-        }
+        // 遮蔽チェック（壁に遮られていないか）
+        RaycastHit2D hit = Physics2D.Raycast(origin, to.normalized, to.magnitude, obstacleMask);
+        if (hit.collider != null) return false;
+
         return true;
     }
 
-#if UNITY_EDITOR
-    // Sceneビューでの可視化（選択時）
+    // 矩形の簡易メッシュ（視覚化用）
+    public void RebuildMesh()
+    {
+        float depth = forwardTiles * tileSize;
+        float halfWidth = (sideTiles + 0.5f) * tileSize;
+
+        Vector3 bl = new Vector3(-halfWidth, 0f, 0f);
+        Vector3 br = new Vector3(+halfWidth, 0f, 0f);
+        Vector3 tl = new Vector3(-halfWidth, depth, 0f);
+        Vector3 tr = new Vector3(+halfWidth, depth, 0f);
+
+        mesh.Clear();
+        mesh.vertices = new Vector3[] { bl, br, tr, tl };
+        mesh.triangles = new int[] { 0, 1, 2, 0, 2, 3 };
+        mesh.RecalculateNormals();
+    }
+
+    void OnValidate()
+    {
+        if (mesh != null) RebuildMesh();
+    }
+
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = new Color(0.3f, 0.6f, 1f, 0.35f);
+        float depth = forwardTiles * tileSize;
+        float halfWidth = (sideTiles + 0.5f) * tileSize;
 
-        Vector2 mainSize = new Vector2(mainTiles.x * tileSize, mainTiles.y * tileSize);
-        Vector2 forwardSize = new Vector2(forwardTiles.x * tileSize, forwardTiles.y * tileSize);
+        var rot = transform.rotation;
+        var pos = transform.position;
 
-        // このTransformの回転・位置を反映
-        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+        Vector3 f = rot * Vector3.up;
+        Vector3 r = rot * Vector3.right;
 
-        // 本体矩形（中心は原点）
-        Gizmos.DrawCube(Vector3.zero, new Vector3(mainSize.x, mainSize.y, 0.01f));
+        Vector3 bl = pos + (-halfWidth) * r + 0f * f;
+        Vector3 br = pos + (+halfWidth) * r + 0f * f;
+        Vector3 tl = pos + (-halfWidth) * r + depth * f;
+        Vector3 tr = pos + (+halfWidth) * r + depth * f;
 
-        // 前方突起（+Yへ）
-        float fwdCenterY = (mainSize.y * 0.5f) + (forwardSize.y * 0.5f);
-        Gizmos.DrawCube(new Vector3(0f, fwdCenterY, 0f), new Vector3(forwardSize.x, forwardSize.y, 0.01f));
-
-        Gizmos.matrix = Matrix4x4.identity;
-    }
-#endif
-
-    // 便利ユーティリティ（任意）
-    public void SetTiles(Vector2Int main, Vector2Int forward)
-    {
-        mainTiles = new Vector2Int(Mathf.Max(1, main.x), Mathf.Max(1, main.y));
-        forwardTiles = new Vector2Int(Mathf.Max(0, forward.x), Mathf.Max(0, forward.y));
+        Gizmos.color = new Color(0f, 1f, 0.2f, 0.5f);
+        Gizmos.DrawLine(bl, br);
+        Gizmos.DrawLine(br, tr);
+        Gizmos.DrawLine(tr, tl);
+        Gizmos.DrawLine(tl, bl);
     }
 }

@@ -26,22 +26,52 @@ public class Goal : MonoBehaviour
     [Header("UI/演出（任意）")]
     //public Animator fadeAnimator;
     //public string fadeTriggerName = "FadeOut";
+    [Header("見た目（DisableRenderer）")]
+    public SpriteRenderer[] renderers;      // 空なら自動収集
 
     private bool entered = false;
     private Collider2D col;
 
-    // Start is called before the first frame update
+    private PlayerController cachedPc;
+
+    // ========= デバッグ即ゴール =========
+    [Header("Debug: Hotkey Goal")]
+    public bool debugHotkeyEnabled = true;      // 本番でも有効
+    public KeyCode debugKey = KeyCode.G;        // 任意のキー
+    public bool debugOnlyInEditor = false;      // ★ 本番でも効かせる
+    public bool debugBypassGoalLock = true;     // 検知ロック無視で即ゴール
+                                                // ===================================
+                                                // Start is called before the first frame update
     void Start()
     {
         col = GetComponent<Collider2D>();
         // ゴール判定はトリガー推奨
         if (col && !col.isTrigger) col.isTrigger = true;
+        // 見た目の自動収集（未設定時）
+        if (renderers == null || renderers.Length == 0)
+            renderers = GetComponentsInChildren<SpriteRenderer>(true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        // --- デバッグ即ゴール ---
+        if (debugHotkeyEnabled && Input.GetKeyDown(debugKey))
+        {
+            if (debugOnlyInEditor && !Application.isEditor) return;
+            if (entered) return;
+
+            // デバッグ起動時のプレイヤー参照を確保
+            if (!cachedPc)
+            {
+                var p = GameObject.FindGameObjectWithTag("Player");
+                if (p) cachedPc = p.GetComponent<PlayerController>();
+                if (!cachedPc) cachedPc = FindObjectOfType<PlayerController>();
+            }
+
+            if (!debugBypassGoalLock && cachedPc && !cachedPc.CanGoal) return;
+            StartGoalSequence(cachedPc); // 通常フローをそのまま実行
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -55,17 +85,29 @@ public class Goal : MonoBehaviour
         // 検知ロック中はゴール不可
         if (pc && !pc.CanGoal) return;
 
-        StartCoroutine(GoalSequence(pc));
+        StartGoalSequence(pc);
     }
 
-    private System.Collections.IEnumerator GoalSequence(PlayerController pc)
+    private void StartGoalSequence(PlayerController pc)
+    {
+        if (entered) return;
+        entered = true;
+
+        cachedPc = pc ? pc : cachedPc; // nullでもOK（内部で使わないなら）
+        if (col) col.enabled = false;
+
+        StartCoroutine(GoalSequence()); // 引数なしで統一
+    }
+
+    private System.Collections.IEnumerator GoalSequence()
     {
         entered = true;
         if (col) col.enabled = false;
 
         //if (fadeAnimator && !string.IsNullOrEmpty(fadeTriggerName))
         //    fadeAnimator.SetTrigger(fadeTriggerName);
-
+        // 見た目を即非表示
+        foreach (var sr in renderers) if (sr) sr.enabled = false;
         // --- BGMを先に止める（フェード可） ---
         var targets = GatherBGMSources();
         if (bgmFadeSeconds > 0f)

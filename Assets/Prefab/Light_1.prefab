@@ -107,7 +107,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   affectedEnemies: []
-  directionOffset: 0
+  directionOffset: 90
 --- !u!114 &-5825866257701245423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,9 +127,9 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
-  respectDisguise: 0
+  respectDisguise: 1
   addDetectSeconds: 5
   stayToGameOverSeconds: 2
   gameOverSceneName: GameOver
   affectedEnemies: []
-  directionOffset: 0
+  directionOffset: 90

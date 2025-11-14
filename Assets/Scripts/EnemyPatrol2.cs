@@ -43,6 +43,8 @@ public class EnemyPatrol2 : MonoBehaviour
     private float lightDetectionTimer = 0f;      // 灯光检测计时器
     private float originalMoveSpeed;             // 保存原始移动速度
     private float originalChaseSpeed;            // 保存原始追逐速度
+    public Vector2 Forward { get; private set; } = Vector2.up;
+
 
     [Header("見た目：向き別スプライト")]
     public Sprite frontSprite;        // 正面（デフォルト＆↓）
@@ -166,6 +168,8 @@ public class EnemyPatrol2 : MonoBehaviour
         ApplySpeedMultiplier();
     }
     
+
+
     /// <summary>
     /// 应用速度倍率
     /// </summary>
@@ -296,42 +300,40 @@ public class EnemyPatrol2 : MonoBehaviour
 
     private bool PlayerInSight()
     {
-        if (playerController.IsDisguised) return false;
-        if (!fieldOfView) return false;
+        if (!playerController) return false;
+        if (playerController.IsDisguised) return false; // 変装は不可視
 
-        Vector2 playerPos = playerController.transform.position;
-        return fieldOfView.ContainsPoint(playerPos);
+        if (!fieldOfView) return false; // 保険
+
+        Vector2 origin = transform.position;
+        Vector2 target = playerController.transform.position;
+
+        // 距離の上限を矩形の奥行でざっくり先に弾く（任意の最適化）
+        float maxDepth = fieldOfView.forwardTiles * fieldOfView.tileSize + 0.01f;
+        if ((target - origin).sqrMagnitude > (maxDepth + 5f) * (maxDepth + 5f)) // 多少バッファ
+            return false;
+
+        // ★ 矩形FOV内かどうか
+        bool inside = fieldOfView.Contains(origin, Forward, target);
+        return inside;
     }
 
     private void AdjustRotation(Vector2 direction)
     {
-        if (direction.magnitude < 0.01f) 
-        {
-            // 如果方向向量太小，使用最后一个有效方向
-            direction = lastValidDirection;
-        }
-        else
-        {
-            // 归一化方向向量并保存
-            direction.Normalize();
-            lastValidDirection = direction;
-        }
-        
-        // 确保transform不旋转，保持UI方向不变
-        transform.rotation = Quaternion.identity;
-        
-        // 根据移动方向更新Sprite（不旋转transform，保持UI方向）
+        // 方向の正規化とフォールバック
+        if (direction.sqrMagnitude < 0.0001f) direction = lastValidDirection;
+        else lastValidDirection = direction.normalized;
+
+        // ★ ここで毎回スプライト更新（呼び出しの一元化）
         UpdateSpriteByDirection(direction);
-        
-        // 只旋转视野（fieldOfView），用于视野检测
-        // transform保持不旋转，这样UI/Sprite就不会旋转
-        if (fieldOfView != null)
-        {
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            fieldOfView.transform.rotation = Quaternion.Euler(0, 0, angle);
-        }
+
+        // FOV（矩形/扇）を前方に合わせる
+        if (fieldOfView) fieldOfView.SetPose(transform.position, lastValidDirection);
+        if (fieldOfView) fieldOfView.transform.rotation =
+            Quaternion.Euler(0, 0, Mathf.Atan2(lastValidDirection.y, lastValidDirection.x) * Mathf.Rad2Deg - 90f);
+
     }
-    
+
     // 根据移动方向更新Sprite
     private void UpdateSpriteByDirection(Vector2 direction)
     {
