@@ -118,7 +118,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.0197196, y: -0.00994885}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -129,7 +129,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2.2656527, y: 2.3106496}
   m_EdgeRadius: 0
 --- !u!114 &3034214061395146225
 MonoBehaviour:
@@ -251,6 +251,10 @@ MonoBehaviour:
   goalSE: {fileID: 0}
   goalSEVolume: 1
   waitSecondsOverride: 0
+  bgmSources: []
+  includeCameraAudio: 1
+  includeTagBGM: 1
+  bgmFadeSeconds: 0.5
 --- !u!61 &509257574774884756
 BoxCollider2D:
   m_ObjectHideFlags: 0

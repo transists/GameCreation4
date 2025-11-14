@@ -4481,6 +4481,22 @@ PrefabInstance:
       propertyPath: shieldVisual
       value: 
       objectReference: {fileID: 1913402024}
+    - target: {fileID: 6056302346641677254, guid: d12f69b94a6946f44b304e85bdb1fa4c, type: 3}
+      propertyPath: m_Size.x
+      value: 2.2214088
+      objectReference: {fileID: 0}
+    - target: {fileID: 6056302346641677254, guid: d12f69b94a6946f44b304e85bdb1fa4c, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3369462
+      objectReference: {fileID: 0}
+    - target: {fileID: 6056302346641677254, guid: d12f69b94a6946f44b304e85bdb1fa4c, type: 3}
+      propertyPath: m_Offset.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6056302346641677254, guid: d12f69b94a6946f44b304e85bdb1fa4c, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.008252978
+      objectReference: {fileID: 0}
     - target: {fileID: 6379287357141320370, guid: d12f69b94a6946f44b304e85bdb1fa4c, type: 3}
       propertyPath: goalSE
       value: 
