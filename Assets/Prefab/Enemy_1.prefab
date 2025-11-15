@@ -553,7 +553,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileSize: 1
-  forwardTiles: 2
+  forwardTiles: 4
   sideTiles: 1
   obstacleMask:
     serializedVersion: 2
