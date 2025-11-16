@@ -54,6 +54,15 @@ public class EnemyPatrol2 : MonoBehaviour
     
     private Vector2 lastValidDirection = Vector2.up; // 存储最后一个有效移动方向
 
+    [Header("サウンド：検知状態ループ")]
+    public AudioClip detectedStateLoop;          // 検知中に鳴らし続けるループSE
+    [Range(0f, 1f)] public float detectedStateVolume = 0.7f;
+    public float detectedFadeSeconds = 0.15f;    // フェードIN/OUT時間
+
+    private AudioSource detectedStateSource;
+    private bool detectedLoopPlaying = false;
+    private Coroutine detectedFadeCo;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -62,9 +71,10 @@ public class EnemyPatrol2 : MonoBehaviour
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
 		se = GetComponent<AudioSource>(); //SE再生用
-		
-		// 确保transform不旋转，保持UI方向不变
-		transform.rotation = Quaternion.identity;
+        detectedStateSource = GetComponent<AudioSource>();
+
+        // 确保transform不旋转，保持UI方向不变
+        transform.rotation = Quaternion.identity;
 		
 		// 初始化Sprite（如果没有设置，使用默认的）
 		if (spriteRenderer != null && frontSprite == null)
@@ -99,6 +109,7 @@ public class EnemyPatrol2 : MonoBehaviour
         // ★ 侵入の"立ち上がり"で一度だけ検知延長（＆倍率上書きがあれば同時適用）
         if (canSeeNow && !wasSeeing)
         {
+            StartDetectedLoop();
             if (playerSpeedMultiplier > 0f)
                 playerController.AddDetectionTimeWithMultiplier(detectionExtendSeconds, playerSpeedMultiplier);
             else
@@ -109,6 +120,7 @@ public class EnemyPatrol2 : MonoBehaviour
         // （ゲームオーバー用）実視認のみで積算
         if (canSeeNow)
         {
+            StartDetectedLoop();
             playerVisibleTimer += Time.deltaTime;
             if (playerVisibleTimer >= gameOverTime)
             {
@@ -118,6 +130,7 @@ public class EnemyPatrol2 : MonoBehaviour
         }
         else
         {
+            StopDetectedLoop();
             playerVisibleTimer = 0f;
         }
 
@@ -427,6 +440,60 @@ public class EnemyPatrol2 : MonoBehaviour
         {
             GameOver();
         }
+    }
+
+    private void StartDetectedLoop()
+    {
+        if (!detectedStateLoop) return;
+
+        FindAnyObjectByType<ScreenFlashController>().StartFlashLoop();
+
+        Debug.Log(detectedStateLoop);
+        detectedStateSource.clip = detectedStateLoop;
+        detectedStateSource.volume = 0f;
+        detectedStateSource.Play();
+        detectedLoopPlaying = true;
+
+        if (detectedFadeCo != null) StopCoroutine(detectedFadeCo);
+        detectedFadeCo = StartCoroutine(FadeVolume(detectedStateSource, 0f, detectedStateVolume, detectedFadeSeconds));
+    }
+
+    private void StopDetectedLoop()
+    {
+        if (!detectedLoopPlaying) return;
+
+        FindAnyObjectByType<ScreenFlashController>().StopFlashLoop();
+
+        if (detectedFadeCo != null) StopCoroutine(detectedFadeCo);
+        detectedFadeCo = StartCoroutine(FadeOutAndStop(detectedStateSource, detectedFadeSeconds));
+        detectedLoopPlaying = false;
+    }
+
+    private System.Collections.IEnumerator FadeVolume(AudioSource src, float from, float to, float sec)
+    {
+        float t = 0f;
+        src.volume = from;
+        while (t < sec)
+        {
+            t += Time.deltaTime;
+            src.volume = Mathf.Lerp(from, to, t / sec);
+            yield return null;
+        }
+        src.volume = to;
+    }
+
+    private System.Collections.IEnumerator FadeOutAndStop(AudioSource src, float sec)
+    {
+        float from = src.volume;
+        float t = 0f;
+        while (t < sec)
+        {
+            t += Time.deltaTime;
+            src.volume = Mathf.Lerp(from, 0f, t / sec);
+            yield return null;
+        }
+        src.volume = 0f;
+        src.Stop();
     }
 
 }

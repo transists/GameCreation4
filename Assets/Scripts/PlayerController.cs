@@ -457,6 +457,7 @@ public class PlayerController : MonoBehaviour
 
         FindAnyObjectByType<ScreenFlashController>().StartFlashLoop();
 
+        Debug.Log(detectedStateLoop);
         detectedStateSource.clip = detectedStateLoop;
         detectedStateSource.volume = 0f;
         detectedStateSource.Play();
