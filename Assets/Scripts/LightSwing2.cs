@@ -1,34 +1,34 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LightSwing2 : MonoBehaviour
 {
-    [Header("ñU‚è")]
-    public float swingAngle = 30f;    // ¶‰EŠp
-    public float speed = 1f;          // ñU‚è‘¬“x
+    [Header("é¦–æŒ¯ã‚Š")]
+    public float swingAngle = 30f;    // å·¦å³è§’
+    public float speed = 1f;          // é¦–æŒ¯ã‚Šé€Ÿåº¦
 
-    [Header("ŒŸ’miƒ‰ƒCƒg‚Ì“–‚½‚è”»’èj")]
+    [Header("æ¤œçŸ¥ï¼ˆãƒ©ã‚¤ãƒˆã®å½“ãŸã‚Šåˆ¤å®šï¼‰")]
     public float detectionRadius = 5f;
     public float detectionAngle = 90f;
     public LayerMask obstacleMask;
-    [Tooltip("•Ï‘•’†‚Í–³‹‚·‚é‚È‚çON")]
+    [Tooltip("å¤‰è£…ä¸­ã¯ç„¡è¦–ã™ã‚‹ãªã‚‰ON")]
     public bool respectDisguise = false;
 
-    [Header("ŒŸ’m ¨ ƒvƒŒƒCƒ„[‘¤‚Ìƒ^ƒCƒ}[‰„’·")]
-    [Tooltip("ƒ‰ƒCƒg”ÍˆÍ‚É“ü‚Á‚½guŠÔh‚É‰ÁZ‚·‚éŒŸ’m•b”")]
+    [Header("æ¤œçŸ¥ â†’ ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å´ã®ã‚¿ã‚¤ãƒãƒ¼å»¶é•·")]
+    [Tooltip("ãƒ©ã‚¤ãƒˆç¯„å›²ã«å…¥ã£ãŸâ€œç¬é–“â€ã«åŠ ç®—ã™ã‚‹æ¤œçŸ¥ç§’æ•°")]
     public float addDetectSeconds = 5f;
 
-    [Header("ƒQ[ƒ€ƒI[ƒo[ğŒ")]
-    [Tooltip("”ÍˆÍ“à‚É˜A‘±‚Å‚±‚Ì•b”ˆÈã‚¢‚é‚ÆGameOver")]
+    [Header("ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æ¡ä»¶")]
+    [Tooltip("ç¯„å›²å†…ã«é€£ç¶šã§ã“ã®ç§’æ•°ä»¥ä¸Šã„ã‚‹ã¨GameOver")]
     public float stayToGameOverSeconds = 2f;
     public string gameOverSceneName = "GameOver";
 
-    [Header("“G’Ê’mi”CˆÓj")]
+    [Header("æ•µé€šçŸ¥ï¼ˆä»»æ„ï¼‰")]
     public EnemyPatrol2[] affectedEnemies;
 
-    [Header("ÆË•ûŒü‚Ì”÷’²®")]
+    [Header("ç…§å°„æ–¹å‘ã®å¾®èª¿æ•´")]
     public float directionOffset = 0f;
 
     private float startAngle;
@@ -52,25 +52,25 @@ public class LightSwing2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // ñU‚è
+        // é¦–æŒ¯ã‚Š
         float angleOffset = Mathf.Sin(Time.time * speed) * swingAngle;
         transform.rotation = Quaternion.Euler(0, 0, startAngle + angleOffset);
 
         bool inRange = IsPlayerInLightRange();
 
-        // •Ï‘•‚ğ‘¸d‚·‚éİ’è‚È‚çA•Ï‘•’†‚Íƒqƒbƒg‚µ‚È‚¢
+        // å¤‰è£…ã‚’å°Šé‡ã™ã‚‹è¨­å®šãªã‚‰ã€å¤‰è£…ä¸­ã¯ãƒ’ãƒƒãƒˆã—ãªã„
         if (respectDisguise && playerController && playerController.IsDisguised)
             inRange = false;
 
-        // “ü‚Á‚½uŠÔ‚Ìˆ—i‰„’·•“G’Ê’mj
+        // å…¥ã£ãŸç¬é–“ã®å‡¦ç†ï¼ˆå»¶é•·ï¼†æ•µé€šçŸ¥ï¼‰
         if (inRange && !wasPlayerInRange)
         {
-            OnPlayerEnterRange(); // “G‚Ö’Ê’m
+            OnPlayerEnterRange(); // æ•µã¸é€šçŸ¥
             if (playerController && addDetectSeconds > 0f)
                 playerController.AddDetectionTime(addDetectSeconds);
         }
 
-        // ˜A‘±‘ØİŠÔ‚ÌŠÄ‹
+        // é€£ç¶šæ»åœ¨æ™‚é–“ã®ç›£è¦–
         if (inRange)
         {
             stayTimer += Time.deltaTime;
@@ -79,7 +79,7 @@ public class LightSwing2 : MonoBehaviour
         }
         else
         {
-            stayTimer = 0f; // —£‚ê‚½‚çƒŠƒZƒbƒgig˜A‘±hğŒj
+            stayTimer = 0f; // é›¢ã‚ŒãŸã‚‰ãƒªã‚»ãƒƒãƒˆï¼ˆâ€œé€£ç¶šâ€æ¡ä»¶ï¼‰
         }
 
         wasPlayerInRange = inRange;
@@ -96,12 +96,12 @@ public class LightSwing2 : MonoBehaviour
 
         if (distance > detectionRadius) return false;
 
-        // Šp“xitransform.up ‚ğ‘O‚Æ‚µA•K—v‚È‚çƒIƒtƒZƒbƒgj
+        // è§’åº¦ï¼ˆtransform.up ã‚’å‰ã¨ã—ã€å¿…è¦ãªã‚‰ã‚ªãƒ•ã‚»ãƒƒãƒˆï¼‰
         Vector2 forward = Quaternion.Euler(0, 0, directionOffset) * (Vector2)transform.up;
         float angleToPlayer = Vector2.Angle(forward, toPlayer);
         if (angleToPlayer > detectionAngle * 0.5f) return false;
 
-        // Õ•Ái•Çj
+        // é®è”½ï¼ˆå£ï¼‰
         RaycastHit2D hit = Physics2D.Raycast(lightPos, toPlayer.normalized, distance, obstacleMask);
         if (hit.collider != null) return false;
 
@@ -118,11 +118,11 @@ public class LightSwing2 : MonoBehaviour
     private IEnumerator GameOverSequence()
     {
         gameOverQueued = true;
-        // •K—v‚È‚ç‚±‚±‚ÅBGMƒtƒF[ƒh/‰æ–ÊƒtƒF[ƒh‚ğ“ü‚ê‚é
+        // å¿…è¦ãªã‚‰ã“ã“ã§BGMãƒ•ã‚§ãƒ¼ãƒ‰/ç”»é¢ãƒ•ã‚§ãƒ¼ãƒ‰ã‚’å…¥ã‚Œã‚‹
         if (!string.IsNullOrEmpty(gameOverSceneName))
             SceneManager.LoadScene(gameOverSceneName);
         else
-            Debug.LogWarning("[LightSwing] gameOverSceneName ‚ª–¢İ’è‚Å‚·B");
+            Debug.LogWarning("[LightSwing] gameOverSceneName ãŒæœªè¨­å®šã§ã™ã€‚");
         yield break;
     }
 

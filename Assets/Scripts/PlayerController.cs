@@ -455,6 +455,8 @@ public class PlayerController : MonoBehaviour
     {
         if (!detectedStateLoop) return;
 
+        FindAnyObjectByType<ScreenFlashController>().StartFlashLoop();
+
         detectedStateSource.clip = detectedStateLoop;
         detectedStateSource.volume = 0f;
         detectedStateSource.Play();
@@ -467,6 +469,8 @@ public class PlayerController : MonoBehaviour
     private void StopDetectedLoop()
     {
         if (!detectedLoopPlaying) return;
+
+        FindAnyObjectByType<ScreenFlashController>().StopFlashLoop();
 
         if (detectedFadeCo != null) StopCoroutine(detectedFadeCo);
         detectedFadeCo = StartCoroutine(FadeOutAndStop(detectedStateSource, detectedFadeSeconds));
@@ -507,5 +511,5 @@ public class PlayerController : MonoBehaviour
         detectedLoopPlaying = false;
     }
 
-    
+
 }
