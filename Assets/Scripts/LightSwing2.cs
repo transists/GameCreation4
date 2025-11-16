@@ -6,8 +6,20 @@ using UnityEngine.SceneManagement;
 public class LightSwing2 : MonoBehaviour
 {
     [Header("首振り")]
-    public float swingAngle = 30f;    // 左右角
-    public float speed = 1f;          // 首振り速度
+    public float swingAngle = 30f;    // 左右角（±）
+    public float speed = 1f;          // 首振り速度（Sin波）
+
+    [Header("回転ターゲット")]
+    [Tooltip("回転させるTransform。未指定なら自身")]
+    public Transform pivot;
+
+    [Header("回転に追従する見た目（任意）")]
+    [Tooltip("回転ヘッドのTransform（SpriteRenderer を持つ子推奨）")]
+    public Transform lampHead;
+    [Tooltip("Pivot の up 方向へどれだけ離すか（ローカル距離）")]
+    public float headDistance = 0.6f;
+    [Tooltip("スプライト絵の向き補正（度）。絵が右向きなら -90 が目安")]
+    public float headSpriteAngleOffset = 0f;
 
     [Header("検知（ライトの当たり判定）")]
     public float detectionRadius = 5f;
@@ -31,15 +43,20 @@ public class LightSwing2 : MonoBehaviour
     [Header("照射方向の微調整")]
     public float directionOffset = 0f;
 
+    // --- 内部 ---
     private float startAngle;
     private PlayerController playerController;
     private bool wasPlayerInRange = false;
     private float stayTimer = 0f;
     private bool gameOverQueued = false;
 
+
     // Start is called before the first frame update
     void Start()
     {
+        // pivot 未指定なら自分を使う
+        if (!pivot) pivot = transform;
+
         startAngle = transform.eulerAngles.z;
 
         var playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -52,10 +69,20 @@ public class LightSwing2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 首振り
+        // ===== 1) 首振り（pivot を回す） =====
         float angleOffset = Mathf.Sin(Time.time * speed) * swingAngle;
-        transform.rotation = Quaternion.Euler(0, 0, startAngle + angleOffset);
+        pivot.rotation = Quaternion.Euler(0, 0, startAngle + angleOffset);
 
+        // ===== 2) 見た目のヘッド追従 =====
+        if (lampHead)
+        {
+            // pivot ローカルの up 方向へオフセット
+            lampHead.localPosition = Vector3.up * headDistance;
+            // スプライト絵の向き補正（見た目だけローカルで追加）
+            lampHead.localRotation = Quaternion.Euler(0, 0, headSpriteAngleOffset);
+        }
+
+        // ===== 3) 検知判定（pivot 基準） =====
         bool inRange = IsPlayerInLightRange();
 
         // 変装を尊重する設定なら、変装中はヒットしない
@@ -70,7 +97,7 @@ public class LightSwing2 : MonoBehaviour
                 playerController.AddDetectionTime(addDetectSeconds);
         }
 
-        // 連続滞在時間の監視
+        // 連続滞在時間の監視（“連続”条件）
         if (inRange)
         {
             stayTimer += Time.deltaTime;
@@ -79,7 +106,7 @@ public class LightSwing2 : MonoBehaviour
         }
         else
         {
-            stayTimer = 0f; // 離れたらリセット（“連続”条件）
+            stayTimer = 0f;
         }
 
         wasPlayerInRange = inRange;
@@ -89,19 +116,19 @@ public class LightSwing2 : MonoBehaviour
     {
         if (!playerController || !playerController.transform) return false;
 
-        Vector2 lightPos = transform.position;
+        Vector2 lightPos = pivot.position;
         Vector2 playerPos = playerController.transform.position;
         Vector2 toPlayer = playerPos - lightPos;
         float distance = toPlayer.magnitude;
 
         if (distance > detectionRadius) return false;
 
-        // 角度（transform.up を前とし、必要ならオフセット）
-        Vector2 forward = Quaternion.Euler(0, 0, directionOffset) * (Vector2)transform.up;
+        // 角度（pivot.up を前とし、必要ならオフセット）
+        Vector2 forward = Quaternion.Euler(0, 0, directionOffset) * (Vector2)pivot.up;
         float angleToPlayer = Vector2.Angle(forward, toPlayer);
         if (angleToPlayer > detectionAngle * 0.5f) return false;
 
-        // 遮蔽（壁）
+        // 遮蔽物（壁）
         RaycastHit2D hit = Physics2D.Raycast(lightPos, toPlayer.normalized, distance, obstacleMask);
         if (hit.collider != null) return false;
 
@@ -128,6 +155,8 @@ public class LightSwing2 : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
+        var piv = pivot ? pivot : transform;
+
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
 
@@ -137,5 +166,11 @@ public class LightSwing2 : MonoBehaviour
         Vector2 rightBound = Quaternion.Euler(0, 0, detectionAngle * 0.5f) * forward;
         Gizmos.DrawRay(transform.position, leftBound * detectionRadius);
         Gizmos.DrawRay(transform.position, rightBound * detectionRadius);
+
+        if (lampHead)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(lampHead.position, 0.06f);
+        }
     }
 }
