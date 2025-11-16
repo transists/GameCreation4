@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     private bool canUseDisguise = true; // 変装が一度だけ使えるようにするためのフラグ
     public Color disguisedColor = Color.cyan; // 変装中の色（インスペクターで変更可能）
     public float disguiseDuration = 10f; // 変装している時間
-    private Color originalColor; // 元の色を保存する変数
+    private Color[] originalColors; // 複数SR分
     private SpriteRenderer spriteRenderer;
 
     // --- ↓ここからグリッド移動用のコード ---
@@ -21,7 +21,9 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     // --- ↑ここまでグリッド移動用のコード ---
     [Header("見た目の出力ターゲット")]
-    public SpriteRenderer spriteRendererTarget; // 実際に描画しているSRをドラッグ推奨
+    [SerializeField] private SpriteRenderer srBase;    // Player/SR_Base をドラッグ
+    [SerializeField] private SpriteRenderer srLitOnly; // Player/SR_LitOnly をドラッグ
+    [SerializeField] private bool forceApplyInLateUpdate = true;
     [Header("見た目：向き別スプライト")]
     public Sprite frontSprite;        // 正面（デフォルト＆↓）
     public Sprite backSprite;         // 後ろ（↑）
@@ -89,11 +91,13 @@ public class PlayerController : MonoBehaviour
     private bool isDetected = false;
     public float currentSpeed;
 
+    // 追加: デバッグ補助
+    [SerializeField] private bool debugLogFacing = false;
+    [SerializeField] private bool forceApplyFacingInLateUpdate = true;
 
     // Start is called before the first frame update
     void Start()
     {
-        if (spriteRendererTarget) originalColor = spriteRendererTarget.color; // 開始時の色を記憶
         // 現在位置から一番近いタイルの中心にスナップさせる
         float x = Mathf.Floor(transform.position.x) + 0.5f;
         float y = Mathf.Floor(transform.position.y) + 0.5f;
@@ -106,22 +110,26 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        if (!spriteRendererTarget)
+        // 自動補助：未割り当てなら名前で探索
+        if (!srBase || !srLitOnly)
         {
-            // 子も含めて“本体っぽい”SRを拾う（任意の自動補助）
-            var all = GetComponentsInChildren<SpriteRenderer>(true);
-            if (all != null && all.Length > 0)
+            var srs = GetComponentsInChildren<SpriteRenderer>(true);
+            foreach (var sr in srs)
             {
-                SpriteRenderer best = null;
-                int bestOrder = int.MinValue;
-                foreach (var sr in all)
-                {
-                    var n = sr.name.ToLower();
-                    if (n.Contains("shadow") || n.Contains("fx") || n.Contains("effect")) continue;
-                    if (sr.sortingOrder >= bestOrder) { best = sr; bestOrder = sr.sortingOrder; }
-                }
-                spriteRendererTarget = best ?? all[0];
+                var n = sr.name.ToLower();
+                if (!srBase && n.Contains("base")) srBase = sr;
+                if (!srLitOnly && n.Contains("lit")) srLitOnly = sr;
             }
+        }
+
+        // 子に余計なSpriteRendererが残っていないか警告
+        {
+            var srs = GetComponentsInChildren<SpriteRenderer>(true);
+            int extra = 0;
+            foreach (var sr in srs)
+                if (sr != srBase && sr != srLitOnly) extra++;
+            if (extra > 0)
+                Debug.LogWarning($"[Player] 子に余計なSpriteRendererが {extra} 個あります。二重描画の原因になります。", this);
         }
 
         if (!footstepSource)
@@ -191,20 +199,14 @@ public class PlayerController : MonoBehaviour
             if (goalLockTimer < 0f) goalLockTimer = 0f;
         }
 
-        /*if (IsDisguised && spriteRendererTarget)
-        {
-            // lastFacingに対応した変装スプライトを毎フレーム強制適用
-            Sprite forced = null;
-            switch (lastFacing)
-            {
-                case Facing.Back: forced = disguiseBackSprite ? disguiseBackSprite : backSprite; break;
-                case Facing.Left: forced = disguiseLeftSprite ? disguiseLeftSprite : leftSprite; break;
-                case Facing.Right: forced = disguiseRightSprite ? disguiseRightSprite : rightSprite; break;
-                default: forced = disguiseFrontSprite ? disguiseFrontSprite : frontSprite; break;
-            }
-            if (forced && spriteRendererTarget.sprite != forced)
-                spriteRendererTarget.sprite = forced;
-        }*/
+        // 入力に応じて lastFacing を更新
+        UpdateFacingByInput(moveInput);
+
+        
+
+        // ※ この時点で一度適用
+        ApplyFacingSprite(lastFacing);
+
         UpdateFootstepAudio();  // ← これを最後の方で呼ぶだけ
         UpdateDetectedLoop();   // ← 毎フレーム呼ぶ
     }
@@ -213,6 +215,13 @@ public class PlayerController : MonoBehaviour
     {
         // 使用物理方式移动（会检测碰撞）
         rb.MovePosition(rb.position + moveInput * currentSpeed * Time.fixedDeltaTime);
+    }
+
+    void LateUpdate()
+    {
+        // 他のスクリプトに上書きされた場合の保険
+        if (forceApplyFacingInLateUpdate)
+            ApplyFacingSprite(lastFacing);
     }
 
     private void UpdateFootstepAudio()
@@ -268,74 +277,51 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateFacingByInput(Vector2 input)
     {
-        if (!spriteRendererTarget) return;
-
         float ax = Mathf.Abs(input.x);
         float ay = Mathf.Abs(input.y);
+        if (ax < facingDeadZone && ay < facingDeadZone) return;
 
-        // 入力が小さければデフォルト正面
-        if (ax < facingDeadZone && ay < facingDeadZone)
-        {
-            ApplyFacingSprite(lastFacing);
-            return;
-        }
+        if (ay >= ax) lastFacing = (input.y > 0f) ? Facing.Back : Facing.Front;
+        else lastFacing = (input.x > 0f) ? Facing.Right : Facing.Left;
 
-        // どちらの成分が大きいかで軸優先（斜め対策）
-        if (ay >= ax)
-        {
-            // 縦優先
-            if (input.y > facingDeadZone)
-            {
-                lastFacing = Facing.Back; // ↑ 後ろ
-            }
-            else if (input.y < -facingDeadZone)
-            {
-                lastFacing = Facing.Front; // ↓ 正面
-            }
-        }
-        else
-        {
-            // 横優先
-            if (input.x > facingDeadZone)
-            {
-                lastFacing = Facing.Right; // → 右
-            }
-            else if (input.x < -facingDeadZone)
-            {
-                lastFacing = Facing.Left;   // ← 左
-            }
-        }
-        ApplyFacingSprite(lastFacing);
+        if (debugLogFacing) Debug.Log($"[PC] Facing={lastFacing}");
     }
 
     private void ApplyFacingSprite(Facing f)
     {
-        if (!spriteRendererTarget) return;
-
-        // 通常/変装をまとめて選ぶヘルパ
-        Sprite Pick(Sprite normal, Sprite disguise)
-            => IsDisguised ? (disguise ? disguise : normal) : normal;
-
-        Sprite target = null;
-        switch (f)
+        Sprite s;
+        if (IsDisguised)
         {
-            case Facing.Back:
-                target = Pick(backSprite, disguiseBackSprite);
-                break;
-            case Facing.Left:
-                target = Pick(leftSprite, disguiseLeftSprite);
-                break;
-            case Facing.Right:
-                target = Pick(rightSprite, disguiseRightSprite);
-                break;
-            default: // Front
-                target = Pick(frontSprite, disguiseFrontSprite);
-                break;
+            switch (f)
+            {
+                case Facing.Back: s = disguiseBackSprite ? disguiseBackSprite : backSprite; break;
+                case Facing.Left: s = disguiseLeftSprite ? disguiseLeftSprite : leftSprite; break;
+                case Facing.Right: s = disguiseRightSprite ? disguiseRightSprite : rightSprite; break;
+                default: s = disguiseFrontSprite ? disguiseFrontSprite : frontSprite; break;
+            }
         }
-
-        if (target && spriteRendererTarget.sprite != target)
-            spriteRendererTarget.sprite = target;
+        else
+        {
+            switch (f)
+            {
+                case Facing.Back: s = backSprite; break;
+                case Facing.Left: s = leftSprite; break;
+                case Facing.Right: s = rightSprite; break;
+                default: s = frontSprite; break;
+            }
+        }
+        SetSpriteBoth(s);
     }
+
+    // 2枚のSRに同じSpriteを必ず適用
+    private void SetSpriteBoth(Sprite s)
+    {
+        if (!s) return;
+        if (srBase) srBase.sprite = s;
+        if (srLitOnly) srLitOnly.sprite = s;
+    }
+
+    
 
     private bool IsValidMove(Vector3 targetPos)
     {
@@ -366,7 +352,6 @@ public class PlayerController : MonoBehaviour
         canUseDisguise = false;
 
         // 見た目を変える（例：色を変える）
-        if (spriteRendererTarget) spriteRendererTarget.color = disguisedColor;
         ApplyFacingSprite(lastFacing); // 即反映
         if (disguiseSE) AudioSource.PlayClipAtPoint(disguiseSE, transform.position, disguiseVolume);
         StartCoroutine(DisguiseTimerCoroutine());
@@ -388,8 +373,6 @@ public class PlayerController : MonoBehaviour
     {
         IsDisguised = false;
 
-        // 色を元の色に戻す
-        if (spriteRendererTarget) spriteRendererTarget.color = originalColor;
         ApplyFacingSprite(lastFacing); // 即反映
         Debug.Log("変装が解除された！");
     }
@@ -523,4 +506,6 @@ public class PlayerController : MonoBehaviour
         if (detectedStateSource) { detectedStateSource.Stop(); }
         detectedLoopPlaying = false;
     }
+
+    
 }
