@@ -249,12 +249,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextSceneName: Goal
   goalSE: {fileID: 0}
-  goalSEVolume: 1
+  goalSEVolume: 0.2
   waitSecondsOverride: 0
   bgmSources: []
   includeCameraAudio: 1
   includeTagBGM: 1
   bgmFadeSeconds: 0.5
+  renderers: []
+  debugHotkeyEnabled: 1
+  debugKey: 103
+  debugOnlyInEditor: 0
+  debugBypassGoalLock: 1
 --- !u!61 &509257574774884756
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -312,7 +317,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
