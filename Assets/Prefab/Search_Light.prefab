@@ -206,7 +206,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   respectDisguise: 0
-  addDetectSeconds: 5
+  addDetectSeconds: 1.5
   stayToGameOverSeconds: 2
   gameOverSceneName: GameOver
   affectedEnemies: []
@@ -258,6 +258,78 @@ PrefabInstance:
     - target: {fileID: 3786283872133586886, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_LocalBounds.m_Center.x
+      value: -2.3679998
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_LocalBounds.m_Center.y
+      value: -0.04524994
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_LocalBounds.m_Extent.x
+      value: 2.6241
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_LocalBounds.m_Extent.y
+      value: 3.63065
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[0].x
+      value: -3.205192
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[0].y
+      value: -3.1749933
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[1].x
+      value: -0.27249157
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[1].y
+      value: -0.23315316
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[2].x
+      value: -0.24204546
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[2].y
+      value: 0.26369488
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[3].x
+      value: -3.1688406
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[3].y
+      value: 3.0851045
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[4].x
+      value: -4.177382
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[4].y
+      value: 1.7817311
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[5].x
+      value: -4.4922705
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[5].y
+      value: 0.009470582
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[6].x
+      value: -4.1786637
+      objectReference: {fileID: 0}
+    - target: {fileID: 8071978465248507323, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
+      propertyPath: m_ShapePath.Array.data[6].y
+      value: -1.7374188
       objectReference: {fileID: 0}
     - target: {fileID: 8129048590566402511, guid: 08cc6801b2df70140863334699fcc9e9, type: 3}
       propertyPath: m_Name

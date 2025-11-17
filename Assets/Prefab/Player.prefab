@@ -237,11 +237,11 @@ MonoBehaviour:
   facingDeadZone: 0.1
   footstepLoopNormal: {fileID: 8300000, guid: a0bf48d817916bd49aa4948daae771e9, type: 3}
   footstepLoopDetected: {fileID: 8300000, guid: 30483acffdc8f234b992fcb7269a218a, type: 3}
-  footstepVolume: 0.6
+  footstepVolume: 1
   moveSfxThreshold: 0.05
   disguiseSE: {fileID: 8300000, guid: 7c1744c5c82528844ad4ef6c71254e1e, type: 3}
   disguiseVolume: 1
-  detectionExtendSeconds: 5
+  detectionExtendSeconds: 2
   detectionTimeRemaining: 0
   detectedSpeedMultiplier: 2
   speedLerp: 12
@@ -295,7 +295,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 0.8, y: 0.8}
   m_EdgeRadius: 0
 --- !u!50 &7299065590000930300
 Rigidbody2D:
