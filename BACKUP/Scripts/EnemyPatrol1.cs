@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class EnemyPatrol2 : MonoBehaviour
+public class EnemyPatrol1 : MonoBehaviour
 {
     public Transform[] patrolPoints; // 巡逻点
     public float moveSpeed = 3f; // 巡逻时的移动速度
@@ -12,7 +12,7 @@ public class EnemyPatrol2 : MonoBehaviour
     [Tooltip("玩家被发现时的移动速度倍率（0表示使用PlayerController的默认值，>0则覆盖）")]
     public float playerSpeedMultiplier = 0f; // 玩家速度倍率（可选，0=使用默认值，>0=覆盖设置）
 
-    public EnemyFieldOfView2 fieldOfView;
+    public EnemyFieldOfView fieldOfView;
     public PlayerController playerController; // 玩家对象
     AudioSource se;
     public AudioClip shotSE;
@@ -43,8 +43,6 @@ public class EnemyPatrol2 : MonoBehaviour
     private float lightDetectionTimer = 0f;      // 灯光检测计时器
     private float originalMoveSpeed;             // 保存原始移动速度
     private float originalChaseSpeed;            // 保存原始追逐速度
-    public Vector2 Forward { get; private set; } = Vector2.up;
-
 
     [Header("見た目：向き別スプライト")]
     public Sprite frontSprite;        // 正面（デフォルト＆↓）
@@ -54,15 +52,6 @@ public class EnemyPatrol2 : MonoBehaviour
     
     private Vector2 lastValidDirection = Vector2.up; // 存储最后一个有效移动方向
 
-    [Header("サウンド：検知状態ループ")]
-    public AudioClip detectedStateLoop;          // 検知中に鳴らし続けるループSE
-    [Range(0f, 1f)] public float detectedStateVolume = 0.7f;
-    public float detectedFadeSeconds = 0.15f;    // フェードIN/OUT時間
-
-    private AudioSource detectedStateSource;
-    private bool detectedLoopPlaying = false;
-    private Coroutine detectedFadeCo;
-
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -71,10 +60,9 @@ public class EnemyPatrol2 : MonoBehaviour
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
 		se = GetComponent<AudioSource>(); //SE再生用
-        detectedStateSource = GetComponent<AudioSource>();
-
-        // 确保transform不旋转，保持UI方向不变
-        transform.rotation = Quaternion.identity;
+		
+		// 确保transform不旋转，保持UI方向不变
+		transform.rotation = Quaternion.identity;
 		
 		// 初始化Sprite（如果没有设置，使用默认的）
 		if (spriteRenderer != null && frontSprite == null)
@@ -109,7 +97,6 @@ public class EnemyPatrol2 : MonoBehaviour
         // ★ 侵入の"立ち上がり"で一度だけ検知延長（＆倍率上書きがあれば同時適用）
         if (canSeeNow && !wasSeeing)
         {
-            StartDetectedLoop();
             if (playerSpeedMultiplier > 0f)
                 playerController.AddDetectionTimeWithMultiplier(detectionExtendSeconds, playerSpeedMultiplier);
             else
@@ -120,7 +107,6 @@ public class EnemyPatrol2 : MonoBehaviour
         // （ゲームオーバー用）実視認のみで積算
         if (canSeeNow)
         {
-            StartDetectedLoop();
             playerVisibleTimer += Time.deltaTime;
             if (playerVisibleTimer >= gameOverTime)
             {
@@ -130,7 +116,6 @@ public class EnemyPatrol2 : MonoBehaviour
         }
         else
         {
-            StopDetectedLoop();
             playerVisibleTimer = 0f;
         }
 
@@ -181,8 +166,6 @@ public class EnemyPatrol2 : MonoBehaviour
         ApplySpeedMultiplier();
     }
     
-
-
     /// <summary>
     /// 应用速度倍率
     /// </summary>
@@ -313,40 +296,59 @@ public class EnemyPatrol2 : MonoBehaviour
 
     private bool PlayerInSight()
     {
-        if (!playerController) return false;
-        if (playerController.IsDisguised) return false; // 変装は不可視
+        // 変装中は見えない（完全ステルス仕様）
+        if (playerController.IsDisguised) return false;
 
-        if (!fieldOfView) return false; // 保険
+        Vector2 myPos = transform.position;
+        Vector2 playerPos = playerController.transform.position;
+        Vector2 toPlayer = (playerPos - myPos);
+        float dist = toPlayer.magnitude;
 
-        Vector2 origin = transform.position;
-        Vector2 target = playerController.transform.position;
+        // 距離
+        if (dist > fieldOfView.viewRadius) return false;
 
-        // 距離の上限を矩形の奥行でざっくり先に弾く（任意の最適化）
-        float maxDepth = fieldOfView.forwardTiles * fieldOfView.tileSize + 0.01f;
-        if ((target - origin).sqrMagnitude > (maxDepth + 5f) * (maxDepth + 5f)) // 多少バッファ
-            return false;
+        // 角度检测：使用fieldOfView的朝向（因为fieldOfView会根据移动方向旋转）
+        // 如果fieldOfView不存在，使用世界坐标的上方向作为默认
+        Vector2 forwardDirection = fieldOfView != null ? fieldOfView.transform.up : Vector2.up;
+        float angle = Vector2.Angle(forwardDirection, toPlayer);
+        if (angle > fieldOfView.viewAngle * 0.5f) return false;
 
-        // ★ 矩形FOV内かどうか
-        bool inside = fieldOfView.Contains(origin, Forward, target);
-        return inside;
+        // 遮蔽物（壁）チェック：FOV側の obstacleMask を使う
+        RaycastHit2D hitWall = Physics2D.Raycast(myPos, toPlayer.normalized, dist, fieldOfView.obstacleMask);
+        if (hitWall.collider != null) return false;
+
+        return true;
     }
 
     private void AdjustRotation(Vector2 direction)
     {
-        // 方向の正規化とフォールバック
-        if (direction.sqrMagnitude < 0.0001f) direction = lastValidDirection;
-        else lastValidDirection = direction.normalized;
-
-        // ★ ここで毎回スプライト更新（呼び出しの一元化）
+        if (direction.magnitude < 0.01f) 
+        {
+            // 如果方向向量太小，使用最后一个有效方向
+            direction = lastValidDirection;
+        }
+        else
+        {
+            // 归一化方向向量并保存
+            direction.Normalize();
+            lastValidDirection = direction;
+        }
+        
+        // 确保transform不旋转，保持UI方向不变
+        transform.rotation = Quaternion.identity;
+        
+        // 根据移动方向更新Sprite（不旋转transform，保持UI方向）
         UpdateSpriteByDirection(direction);
-
-        // FOV（矩形/扇）を前方に合わせる
-        if (fieldOfView) fieldOfView.SetPose(transform.position, lastValidDirection);
-        //if (fieldOfView) fieldOfView.transform.rotation =
-        //    Quaternion.Euler(0, 0, Mathf.Atan2(lastValidDirection.y, lastValidDirection.x) * Mathf.Rad2Deg - 90f);
-
+        
+        // 只旋转视野（fieldOfView），用于视野检测
+        // transform保持不旋转，这样UI/Sprite就不会旋转
+        if (fieldOfView != null)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            fieldOfView.transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
     }
-
+    
     // 根据移动方向更新Sprite
     private void UpdateSpriteByDirection(Vector2 direction)
     {
@@ -440,60 +442,6 @@ public class EnemyPatrol2 : MonoBehaviour
         {
             GameOver();
         }
-    }
-
-    private void StartDetectedLoop()
-    {
-        if (!detectedStateLoop) return;
-
-        FindAnyObjectByType<ScreenFlashController>().StartFlashLoop();
-
-        Debug.Log(detectedStateLoop);
-        detectedStateSource.clip = detectedStateLoop;
-        detectedStateSource.volume = 0f;
-        detectedStateSource.Play();
-        detectedLoopPlaying = true;
-
-        if (detectedFadeCo != null) StopCoroutine(detectedFadeCo);
-        detectedFadeCo = StartCoroutine(FadeVolume(detectedStateSource, 0f, detectedStateVolume, detectedFadeSeconds));
-    }
-
-    private void StopDetectedLoop()
-    {
-        if (!detectedLoopPlaying) return;
-
-        FindAnyObjectByType<ScreenFlashController>().StopFlashLoop();
-
-        if (detectedFadeCo != null) StopCoroutine(detectedFadeCo);
-        detectedFadeCo = StartCoroutine(FadeOutAndStop(detectedStateSource, detectedFadeSeconds));
-        detectedLoopPlaying = false;
-    }
-
-    private System.Collections.IEnumerator FadeVolume(AudioSource src, float from, float to, float sec)
-    {
-        float t = 0f;
-        src.volume = from;
-        while (t < sec)
-        {
-            t += Time.deltaTime;
-            src.volume = Mathf.Lerp(from, to, t / sec);
-            yield return null;
-        }
-        src.volume = to;
-    }
-
-    private System.Collections.IEnumerator FadeOutAndStop(AudioSource src, float sec)
-    {
-        float from = src.volume;
-        float t = 0f;
-        while (t < sec)
-        {
-            t += Time.deltaTime;
-            src.volume = Mathf.Lerp(from, 0f, t / sec);
-            yield return null;
-        }
-        src.volume = 0f;
-        src.Stop();
     }
 
 }

@@ -1,0 +1,98 @@
+﻿using UnityEngine;
+
+public class EnemyPatrol : MonoBehaviour
+{
+    public Transform[] patrolPoints; // 巡逻点
+    public float moveSpeed = 2f;
+    private int currentPointIndex = 0;
+
+    public EnemyFieldOfView fieldOfView;
+    public PlayerController playerController; // 玩家对象
+    AudioSource se;
+    public AudioClip shotSE;
+
+    private SpriteRenderer spriteRenderer;
+
+    public float gameOverTime = 2.0f; // 游戏结束延迟时间
+    private float playerVisibleTimer = 0.0f; // 玩家可见时间
+
+    private void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+		se = GetComponent<AudioSource>(); //SE再生用
+	}
+
+    void Update()
+    {
+        if (playerController.transform == null) return;
+
+        if (PlayerInSight())
+        {
+            ChasePlayer();
+
+            playerVisibleTimer += Time.deltaTime;
+            //Debug.Log("Player visible for: " + playerVisibleTimer + " seconds");
+            if (playerVisibleTimer >= gameOverTime)
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("GameOver");
+            }
+        }
+        else
+        {
+            playerVisibleTimer = 0.0f;
+            Patrol();
+        }
+    }
+
+    private void Patrol()
+    {
+        Vector2 direction = (patrolPoints[currentPointIndex].position - transform.position).normalized;
+        transform.position = Vector2.MoveTowards(transform.position, patrolPoints[currentPointIndex].position, moveSpeed * Time.deltaTime);
+
+        if (Vector2.Distance(transform.position, patrolPoints[currentPointIndex].position) < 0.1f)
+        {
+            currentPointIndex = (currentPointIndex + 1) % patrolPoints.Length;
+        }
+
+        AdjustRotation(direction);
+    }
+
+    private void ChasePlayer()
+    {
+        Vector2 direction = (playerController.transform.position - transform.position).normalized;
+        AdjustRotation(direction);
+    }
+
+    private bool PlayerInSight()
+    {
+        // プレイヤーが変装中なら、即座に「見えていない」ことにして処理を終了する
+        if (playerController.IsDisguised)
+        {
+            return false;
+        }
+
+        // player変数をplayerController.transformに置き換えるのを忘れないように
+        if (playerController == null || fieldOfView == null) return false;
+
+        Vector2 directionToPlayer = (playerController.transform.position - transform.position).normalized;
+        float distanceToPlayer = Vector2.Distance(transform.position, playerController.transform.position);
+
+        if (distanceToPlayer > fieldOfView.viewRadius) return false;
+        float angleToPlayer = Vector2.Angle(transform.up, directionToPlayer);
+        if (angleToPlayer > fieldOfView.viewAngle / 2) return false;
+
+        return true;
+    }
+
+    private void AdjustRotation(Vector2 direction)
+    {
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+        //Debug.Log("Enemy Rotation Angle: " + angle);
+        if (fieldOfView != null)
+        {
+            fieldOfView.transform.rotation = transform.rotation;
+        }
+    }
+
+}
