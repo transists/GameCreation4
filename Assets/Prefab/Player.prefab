@@ -239,7 +239,7 @@ MonoBehaviour:
   footstepLoopDetected: {fileID: 8300000, guid: 30483acffdc8f234b992fcb7269a218a, type: 3}
   footstepVolume: 1
   moveSfxThreshold: 0.05
-  disguiseSE: {fileID: 8300000, guid: 7c1744c5c82528844ad4ef6c71254e1e, type: 3}
+  disguiseSE: {fileID: 8300000, guid: 2b42b30c836e8a4499193c5f8ecd04d2, type: 3}
   disguiseVolume: 1
   detectionExtendSeconds: 2
   detectionTimeRemaining: 0

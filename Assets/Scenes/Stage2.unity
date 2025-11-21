@@ -5593,7 +5593,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 3d7359f2c8d0d8e4cbcb60415782d949, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 67750828be778de4cada4e1cb9255c6a, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.1
   m_Pitch: 1
@@ -5736,6 +5736,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4215441074775815491, guid: 69874329ae9e35743afb204164a52605, type: 3}
+      propertyPath: unlockSE
+      value: 
+      objectReference: {fileID: 8300000, guid: 548caf166a517a04bb2fe0aedab3ba17, type: 3}
     - target: {fileID: 4455812087767425124, guid: 69874329ae9e35743afb204164a52605, type: 3}
       propertyPath: m_Name
       value: LockedWall
@@ -5878,6 +5882,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Key
       objectReference: {fileID: 0}
+    - target: {fileID: 3036814619532047398, guid: d6c4d45c8c08cc747bd4f4a9fbe4771f, type: 3}
+      propertyPath: pickSE
+      value: 
+      objectReference: {fileID: 8300000, guid: 429f3936ff39d4c4494b673ce174b185, type: 3}
     - target: {fileID: 3036814619532047398, guid: d6c4d45c8c08cc747bd4f4a9fbe4771f, type: 3}
       propertyPath: targetWall
       value: 
