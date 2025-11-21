@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/taitoru.unity
     guid: 5ae098ddc5afa8043871c1d12868807a
   - enabled: 1
+    path: Assets/Scenes/Tutorial.unity
+    guid: c0a4c30bfc18865489d36fe9df88ed6b
+  - enabled: 1
     path: Assets/Scenes/Stage1.unity
     guid: b62aeb4014d1b2541837dad85d20e624
   - enabled: 1
